@@ -16,7 +16,9 @@
     "ui-screenshots": "npm run build && node scripts/ui-screenshots.ts",
     "themes": "node scripts/themes.mjs",
     "gallery": "npm run build && node scripts/gallery.ts",
-    "icons": "node scripts/render-icons.mjs"
+    "icons": "node scripts/render-icons.mjs",
+    "video:capture": "npm run build && node marketing/video/capture.ts",
+    "video:render": "node marketing/video/render.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",

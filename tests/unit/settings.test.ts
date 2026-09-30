@@ -57,7 +57,9 @@ describe('first-paint stylesheet registration', () => {
     expect(bootFileFor(custom['custom-navy']!.definition)).toBe('boot/nightfox.css'); // #192330 is closest to #101830
     const light = { ...custom['custom-navy']!.definition, id: 'custom-paper', mode: 'light' as const };
     light.background = { ...light.background, page: '#ffffff' };
-    expect(bootFileFor(light)).toBe('boot/github-light-high-contrast.css'); // pure white
+    // Pure white: any built-in with a white page will do (GitHub Light has two).
+    const white = bootFileFor(light).replace(/^boot\/|\.css$/g, '');
+    expect(findTheme(white)?.background.page).toBe('#ffffff');
     const scripts = bootScripts(settings({ defaultTheme: 'custom-navy' }), custom);
     expect(scripts).toEqual([expect.objectContaining({ id: 'boot-default', css: ['boot/nightfox.css'] })]);
   });

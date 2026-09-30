@@ -1,10 +1,12 @@
 # universal-theme-extension
 Apply color themes universally to chrome! Any web page any theme! WHAT! O yes!
 
-Pick a theme (all six Gruvbox variants ship today) as the default for every site, or per site. The
+Pick one of 75 built-in themes (or make your own) as the default for every site, or per site. The
 extension asks [Jev](https://docs.typesafe.ai) — TypeSafe AI's decision model — what every element on
 the page *is* (page, card, input, primary button, muted text, link, divider…), and the theme decides what
 color each of those roles gets.
+
+▶ **[Watch the video](marketing/universal-theme.mp4)**: one minute, 75 themes, and Inky.
 
 <img src="assets/icons/128.png" width="64" alt="Inky, a pink pixel octopus" align="right">
 
@@ -152,6 +154,7 @@ extension from `chrome://extensions` after rebuilding.
 | `npm run schema` | Regenerate `src/themes/theme.schema.json` from the theme format |
 | `npm run themes -- derive\|check\|index` | Tools for built-in theme files (see Themes) |
 | `npm run gallery -- [url] [settle-ms]` | One page in every built-in theme as a contact sheet, real Jev |
+| `npm run video:capture` / `npm run video:render` | The marketing video (see `marketing/video/README.md`) |
 
 The real-Jev scripts read the key from `TYPESAFE_API_KEY`, or from `JEV_KEY` in `secrets.env`
 (git-ignored).

@@ -10,9 +10,9 @@ import catppuccinFrappe from './catppuccin-frappe.json' with { type: 'json' };
 import catppuccinMacchiato from './catppuccin-macchiato.json' with { type: 'json' };
 import catppuccinMocha from './catppuccin-mocha.json' with { type: 'json' };
 import catppuccinLatte from './catppuccin-latte.json' with { type: 'json' };
+import tokyoNight from './tokyo-night.json' with { type: 'json' };
 import tokyoNightMoon from './tokyo-night-moon.json' with { type: 'json' };
 import tokyoNightStorm from './tokyo-night-storm.json' with { type: 'json' };
-import tokyoNight from './tokyo-night.json' with { type: 'json' };
 import tokyoNightDay from './tokyo-night-day.json' with { type: 'json' };
 import dracula from './dracula.json' with { type: 'json' };
 import draculaAlucard from './dracula-alucard.json' with { type: 'json' };
@@ -21,14 +21,14 @@ import solarizedDark from './solarized-dark.json' with { type: 'json' };
 import solarizedLight from './solarized-light.json' with { type: 'json' };
 import oneDark from './one-dark.json' with { type: 'json' };
 import oneLight from './one-light.json' with { type: 'json' };
-import rosePineMoon from './rose-pine-moon.json' with { type: 'json' };
 import rosePine from './rose-pine.json' with { type: 'json' };
+import rosePineMoon from './rose-pine-moon.json' with { type: 'json' };
 import rosePineDawn from './rose-pine-dawn.json' with { type: 'json' };
+import githubDark from './github-dark.json' with { type: 'json' };
 import githubDarkDimmed from './github-dark-dimmed.json' with { type: 'json' };
 import githubDarkHighContrast from './github-dark-high-contrast.json' with { type: 'json' };
-import githubDark from './github-dark.json' with { type: 'json' };
-import githubLightHighContrast from './github-light-high-contrast.json' with { type: 'json' };
 import githubLight from './github-light.json' with { type: 'json' };
+import githubLightHighContrast from './github-light-high-contrast.json' with { type: 'json' };
 import kanagawaDragon from './kanagawa-dragon.json' with { type: 'json' };
 import kanagawaWave from './kanagawa-wave.json' with { type: 'json' };
 import kanagawaLotus from './kanagawa-lotus.json' with { type: 'json' };
@@ -44,16 +44,16 @@ import ayuMirage from './ayu-mirage.json' with { type: 'json' };
 import ayuLight from './ayu-light.json' with { type: 'json' };
 import nightOwl from './night-owl.json' with { type: 'json' };
 import lightOwl from './light-owl.json' with { type: 'json' };
+import material from './material.json' with { type: 'json' };
 import materialDarker from './material-darker.json' with { type: 'json' };
 import materialDeepOcean from './material-deep-ocean.json' with { type: 'json' };
 import materialOceanic from './material-oceanic.json' with { type: 'json' };
 import materialPalenight from './material-palenight.json' with { type: 'json' };
-import material from './material.json' with { type: 'json' };
 import materialLighter from './material-lighter.json' with { type: 'json' };
+import tomorrowNight from './tomorrow-night.json' with { type: 'json' };
 import tomorrowNightBlue from './tomorrow-night-blue.json' with { type: 'json' };
 import tomorrowNightBright from './tomorrow-night-bright.json' with { type: 'json' };
 import tomorrowNightEighties from './tomorrow-night-eighties.json' with { type: 'json' };
-import tomorrowNight from './tomorrow-night.json' with { type: 'json' };
 import tomorrow from './tomorrow.json' with { type: 'json' };
 import carbonfox from './carbonfox.json' with { type: 'json' };
 import duskfox from './duskfox.json' with { type: 'json' };
@@ -88,9 +88,9 @@ export default [
   catppuccinMacchiato,
   catppuccinMocha,
   catppuccinLatte,
+  tokyoNight,
   tokyoNightMoon,
   tokyoNightStorm,
-  tokyoNight,
   tokyoNightDay,
   dracula,
   draculaAlucard,
@@ -99,14 +99,14 @@ export default [
   solarizedLight,
   oneDark,
   oneLight,
-  rosePineMoon,
   rosePine,
+  rosePineMoon,
   rosePineDawn,
+  githubDark,
   githubDarkDimmed,
   githubDarkHighContrast,
-  githubDark,
-  githubLightHighContrast,
   githubLight,
+  githubLightHighContrast,
   kanagawaDragon,
   kanagawaWave,
   kanagawaLotus,
@@ -122,16 +122,16 @@ export default [
   ayuLight,
   nightOwl,
   lightOwl,
+  material,
   materialDarker,
   materialDeepOcean,
   materialOceanic,
   materialPalenight,
-  material,
   materialLighter,
+  tomorrowNight,
   tomorrowNightBlue,
   tomorrowNightBright,
   tomorrowNightEighties,
-  tomorrowNight,
   tomorrow,
   carbonfox,
   duskfox,

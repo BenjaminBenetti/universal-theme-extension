@@ -96,7 +96,8 @@ function index() {
       rank(a.theme.family) - rank(b.theme.family) ||
       (a.theme.family ?? '').localeCompare(b.theme.family ?? '') ||
       (a.theme.mode === b.theme.mode ? 0 : a.theme.mode === 'dark' ? -1 : 1) ||
-      a.file.localeCompare(b.file),
+      // By id, so a family's base theme ("tokyo-night") comes before its variants ("tokyo-night-moon").
+      a.theme.id.localeCompare(b.theme.id),
   );
   const name = (file) => file.replace(/\.json$/, '').replace(/-(\w)/g, (_, c) => c.toUpperCase()).replace(/^(\d)/, '_$1');
   const lines = [

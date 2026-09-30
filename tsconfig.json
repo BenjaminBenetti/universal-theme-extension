@@ -24,6 +24,7 @@
     "src",
     "scripts",
     "tests",
+    "marketing",
     "*.config.ts"
   ]
 }

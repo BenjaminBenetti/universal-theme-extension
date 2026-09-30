@@ -25,16 +25,27 @@ export function jevKey(): string | undefined {
   return /^JEV_KEY=(.*)$/m.exec(fs.readFileSync(file, 'utf8'))?.[1]?.trim();
 }
 
-export async function launchExtension(options: { headless?: boolean; viewport?: { width: number; height: number } } = {}): Promise<Extension> {
-  const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ute-profile-'));
+export async function launchExtension(
+  options: {
+    headless?: boolean;
+    viewport?: { width: number; height: number };
+    deviceScaleFactor?: number;
+    /** Keep the profile (cookies, extension storage) in this folder between runs. */
+    userDataDir?: string;
+  } = {},
+): Promise<Extension> {
+  const keepProfile = !!options.userDataDir;
+  const userDataDir = options.userDataDir ?? fs.mkdtempSync(path.join(os.tmpdir(), 'ute-profile-'));
   const context = await chromium.launchPersistentContext(userDataDir, {
     executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium',
     headless: options.headless ?? true,
     viewport: options.viewport ?? { width: 1280, height: 800 },
+    deviceScaleFactor: options.deviceScaleFactor ?? 1,
     locale: 'en-US',
     args: [`--disable-extensions-except=${DIST}`, `--load-extension=${DIST}`],
   });
   const worker = context.serviceWorkers()[0] ?? (await context.waitForEvent('serviceworker'));
+  if (keepProfile) await worker.evaluate(() => new Promise((r) => setTimeout(r, 200)));
   // The install handler opens the settings page when there is no key yet; close it.
   await new Promise((r) => setTimeout(r, 300));
   for (const page of context.pages()) if (page.url().startsWith('chrome-extension://')) await page.close();
@@ -58,7 +69,7 @@ export async function launchExtension(options: { headless?: boolean; viewport?: 
     storage: () => worker.evaluate(() => chrome.storage.local.get(null)),
     async close() {
       await context.close();
-      fs.rmSync(userDataDir, { recursive: true, force: true });
+      if (!keepProfile) fs.rmSync(userDataDir, { recursive: true, force: true });
     },
   };
 }
