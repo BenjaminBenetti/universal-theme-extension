@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Universal Theme",
   "version": "0.0.0",
-  "description": "Any website, any theme. Jev decides what every element is; your theme decides its color.",
+  "description": "Any website, any theme.",
   "permissions": [
     "storage",
     "unlimitedStorage",
