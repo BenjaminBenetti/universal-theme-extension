@@ -119,7 +119,16 @@ Pages only ever receive their active theme's colors, so shipping more themes cos
 Theme pickers (popup and settings) are type-ahead. Type any part of a name, family, or mode, with
 words in any order ("light hard", "gruv soft"), then pick with the mouse or ↑/↓ and Enter.
 
-## Setup
+## Install
+
+1. Download the zip from the [latest release](https://github.com/BenjaminBenetti/universal-theme-extension/releases/latest)
+   and unzip it.
+2. In Chrome, open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked**, and pick
+   the unzipped folder.
+3. The settings page opens: paste a TypeSafe API key from [console.typesafe.ai](https://console.typesafe.ai)
+   and save.
+
+## Setup (from source)
 
 1. Get a TypeSafe API key at [console.typesafe.ai](https://console.typesafe.ai).
 2. `npm install && npm run build`
@@ -145,6 +154,7 @@ extension from `chrome://extensions` after rebuilding.
 | Command | What it does |
 | --- | --- |
 | `npm run build` / `npm run watch` | Bundle `src/` into `dist/` (esbuild) and generate the theme CSS |
+| `npm run package` | Release build of `dist/` (no source maps), zipped as `release/universal-theme-<version>.zip` |
 | `npm run typecheck` | TypeScript |
 | `npm test` | Unit tests (Vitest): color naming, themes, CSS, questions, settings |
 | `npm run test:e2e` | Loads the extension in Chromium against a mock Jev (Playwright) |
@@ -158,6 +168,11 @@ extension from `chrome://extensions` after rebuilding.
 
 The real-Jev scripts read the key from `TYPESAFE_API_KEY`, or from `JEV_KEY` in `secrets.env`
 (git-ignored).
+
+**Releasing:** `npm version <major|minor|patch>` bumps the version and tags it, then
+`git push --follow-tags`. The tag starts the Release workflow (`.github/workflows/release.yml`):
+it checks the tag matches `package.json`, runs the typecheck and unit tests, builds the zip, and
+publishes a GitHub release with it attached.
 
 ### Layout
 

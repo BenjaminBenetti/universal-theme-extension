@@ -1,4 +1,5 @@
-// Builds the unpacked extension into dist/. Usage: node scripts/build.mjs [--watch]
+// Builds the unpacked extension into dist/. Usage: node scripts/build.mjs [--watch | --release]
+// --release leaves out source maps (npm run package uses it).
 import * as esbuild from 'esbuild';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -10,6 +11,7 @@ import { validateTheme } from '../src/themes/format.ts';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dist = path.join(root, 'dist');
 const watch = process.argv.includes('--watch');
+const release = process.argv.includes('--release');
 
 async function writeStatic() {
   await fs.mkdir(path.join(dist, 'boot'), { recursive: true });
@@ -33,7 +35,7 @@ async function writeStatic() {
   }
 }
 
-const common = { bundle: true, target: 'chrome120', sourcemap: 'linked', logLevel: 'info', legalComments: 'none' };
+const common = { bundle: true, target: 'chrome120', sourcemap: release ? false : 'linked', logLevel: 'info', legalComments: 'none' };
 const builds = [
   { ...common, entryPoints: { content: 'src/content/index.ts', 'main-world': 'src/content/main-world.ts' }, format: 'iife', outdir: dist },
   { ...common, entryPoints: { background: 'src/background/index.ts' }, format: 'esm', outdir: dist },
