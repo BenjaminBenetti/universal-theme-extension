@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Universal Theme — Settings</title>
+    <link rel="stylesheet" href="ui.css" />
+    <style>
+      body { padding: 32px 16px; }
+      main { max-width: 560px; margin: 0 auto; display: grid; gap: 24px; }
+      section { background: var(--bg1); border-radius: 8px; padding: 16px; }
+      section select, section input { background: var(--bg0); }
+      .key-row { display: flex; gap: 8px; }
+      .key-row input { flex: 1; }
+      table { width: 100%; border-collapse: collapse; }
+      td { padding: 6px 0; border-bottom: 1px solid var(--bg2); }
+      td:last-child { text-align: right; }
+      #key-status { margin-top: 6px; min-height: 1.4em; }
+      .section-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+      .section-head h2 { margin: 0; }
+      .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+      .theme-list { list-style: none; margin: 0; padding: 0; }
+      .theme-list li { display: grid; grid-template-columns: 1fr 90px auto; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--bg2); }
+      .theme-list .name { color: var(--fg0); }
+      .theme-list .swatches { margin: 0; }
+      .theme-list .actions button { padding: 4px 10px; }
+      @media (max-width: 480px) { .theme-list li { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Universal Theme</h1>
+        <p class="muted">Jev (TypeSafe AI) decides what every element on a page is. Your theme decides its color.</p>
+      </header>
+
+      <section>
+        <h2>Jev API key</h2>
+        <p class="muted">Create one at <a href="https://console.typesafe.ai" target="_blank" rel="noreferrer">console.typesafe.ai</a>. It is stored only in this browser.</p>
+        <div class="key-row">
+          <input id="api-key" type="password" placeholder="Paste your TypeSafe API key" autocomplete="off" />
+          <button id="save-key" class="primary">Save</button>
+        </div>
+        <div id="key-status" class="muted"></div>
+      </section>
+
+      <section>
+        <h2>Theme</h2>
+        <div class="field">
+          <label for="default-theme">Default for all sites</label>
+          <div id="default-picker"></div>
+        </div>
+        <label class="field">
+          <span>Re-layout sites after (hours)</span>
+          <input id="cache-hours" type="number" min="1" max="720" />
+        </label>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <h2>My themes</h2>
+          <div class="actions">
+            <button id="import-theme">Import JSON</button>
+            <button id="new-theme" class="primary">New theme</button>
+          </div>
+        </div>
+        <p id="no-themes" class="muted">Make your own theme by starting from any theme and changing its colors.</p>
+        <ul id="themes" class="theme-list"></ul>
+      </section>
+
+      <section>
+        <h2>Per-site themes</h2>
+        <p id="no-sites" class="muted">No overrides yet. Pick a theme for a site from the toolbar popup.</p>
+        <table><tbody id="sites"></tbody></table>
+      </section>
+
+      <section>
+        <h2>Jev's labels</h2>
+        <p class="muted">Labels are cached per site so pages theme instantly and switching themes is free.</p>
+        <button id="clear-cache">Forget all labels</button>
+        <span id="cache-status" class="muted"></span>
+      </section>
+    </main>
+    <script src="options.js"></script>
+  </body>
+</html>

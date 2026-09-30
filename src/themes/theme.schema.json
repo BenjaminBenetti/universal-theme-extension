@@ -1,0 +1,386 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/BenjaminBenetti/universal-theme-extension/theme.schema.json",
+  "title": "Universal Theme color theme",
+  "description": "A color for every design token Jev can label a page element with.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "name",
+    "mode",
+    "background",
+    "text",
+    "border",
+    "textOnFill",
+    "interface"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "format": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Lowercase letters, digits, and dashes."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "family": {
+      "type": "string",
+      "description": "Groups themes in pickers."
+    },
+    "mode": {
+      "enum": [
+        "dark",
+        "light"
+      ],
+      "description": "Whether the page background is dark or light."
+    },
+    "background": {
+      "type": "object",
+      "description": "Backgrounds",
+      "additionalProperties": false,
+      "required": [
+        "page",
+        "surface",
+        "raised",
+        "input",
+        "control",
+        "selected",
+        "code",
+        "accent",
+        "danger",
+        "success",
+        "warning",
+        "info",
+        "highlight",
+        "divider",
+        "overlay",
+        "accent-soft",
+        "danger-soft",
+        "success-soft",
+        "warning-soft",
+        "info-soft"
+      ],
+      "properties": {
+        "page": {
+          "$ref": "#/$defs/color",
+          "title": "Page",
+          "description": "The main page canvas that everything else sits on"
+        },
+        "surface": {
+          "$ref": "#/$defs/color",
+          "title": "Surface",
+          "description": "A broad band that separates itself from the page: header bar, navigation bar, sidebar, footer, toolbar, or section background"
+        },
+        "raised": {
+          "$ref": "#/$defs/color",
+          "title": "Raised",
+          "description": "A container that floats above content: card, panel, tile, dropdown menu, popover, dialog, or tooltip"
+        },
+        "input": {
+          "$ref": "#/$defs/color",
+          "title": "Input",
+          "description": "A text field, search box, text area, or select box"
+        },
+        "control": {
+          "$ref": "#/$defs/color",
+          "title": "Control",
+          "description": "A neutral button, chip, pill, tag, tab, toggle, or badge with no special meaning"
+        },
+        "selected": {
+          "$ref": "#/$defs/color",
+          "title": "Selected",
+          "description": "The selected, active, hovered, or current item in a list, menu, or set of tabs"
+        },
+        "code": {
+          "$ref": "#/$defs/color",
+          "title": "Code",
+          "description": "A code block, inline code snippet, keyboard key, or preformatted text"
+        },
+        "accent": {
+          "$ref": "#/$defs/color",
+          "title": "Accent",
+          "description": "The primary call-to-action button, or an element filled with the brand color"
+        },
+        "danger": {
+          "$ref": "#/$defs/color",
+          "title": "Danger",
+          "description": "Error, delete, or destructive styling"
+        },
+        "success": {
+          "$ref": "#/$defs/color",
+          "title": "Success",
+          "description": "Success, confirmation, or positive-state styling"
+        },
+        "warning": {
+          "$ref": "#/$defs/color",
+          "title": "Warning",
+          "description": "Warning or caution styling"
+        },
+        "info": {
+          "$ref": "#/$defs/color",
+          "title": "Info",
+          "description": "Informational notice or tip styling"
+        },
+        "highlight": {
+          "$ref": "#/$defs/color",
+          "title": "Highlight",
+          "description": "Highlighted or marked text, like a search match or a text marker"
+        },
+        "divider": {
+          "$ref": "#/$defs/color",
+          "title": "Divider",
+          "description": "A thin line or separator drawn with a background color"
+        },
+        "overlay": {
+          "$ref": "#/$defs/color",
+          "title": "Overlay",
+          "description": "A dimming backdrop behind a modal, drawer, or lightbox"
+        },
+        "accent-soft": {
+          "$ref": "#/$defs/color",
+          "title": "Accent soft",
+          "description": "A pale accent tint for banners, alerts, and highlighted rows"
+        },
+        "danger-soft": {
+          "$ref": "#/$defs/color",
+          "title": "Danger soft",
+          "description": "A pale danger tint for banners, alerts, and highlighted rows"
+        },
+        "success-soft": {
+          "$ref": "#/$defs/color",
+          "title": "Success soft",
+          "description": "A pale success tint for banners, alerts, and highlighted rows"
+        },
+        "warning-soft": {
+          "$ref": "#/$defs/color",
+          "title": "Warning soft",
+          "description": "A pale warning tint for banners, alerts, and highlighted rows"
+        },
+        "info-soft": {
+          "$ref": "#/$defs/color",
+          "title": "Info soft",
+          "description": "A pale info tint for banners, alerts, and highlighted rows"
+        }
+      }
+    },
+    "text": {
+      "type": "object",
+      "description": "Text",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "strong",
+        "muted",
+        "faint",
+        "link",
+        "on-accent",
+        "accent",
+        "danger",
+        "success",
+        "warning",
+        "info"
+      ],
+      "properties": {
+        "text": {
+          "$ref": "#/$defs/color",
+          "title": "Text",
+          "description": "Normal body text"
+        },
+        "strong": {
+          "$ref": "#/$defs/color",
+          "title": "Strong",
+          "description": "Headings, titles, and emphasized text"
+        },
+        "muted": {
+          "$ref": "#/$defs/color",
+          "title": "Muted",
+          "description": "Secondary text: captions, metadata, timestamps, descriptions, and labels"
+        },
+        "faint": {
+          "$ref": "#/$defs/color",
+          "title": "Faint",
+          "description": "Placeholder, disabled, or barely-there hint text"
+        },
+        "link": {
+          "$ref": "#/$defs/color",
+          "title": "Link",
+          "description": "A hyperlink or clickable text link"
+        },
+        "on-accent": {
+          "$ref": "#/$defs/color",
+          "title": "On accent",
+          "description": "Text or icons sitting on a solid, saturated colored background such as a brand-colored button"
+        },
+        "accent": {
+          "$ref": "#/$defs/color",
+          "title": "Accent",
+          "description": "Brand-colored text or icons, such as an active tab label or a highlighted keyword"
+        },
+        "danger": {
+          "$ref": "#/$defs/color",
+          "title": "Danger",
+          "description": "Error or destructive text"
+        },
+        "success": {
+          "$ref": "#/$defs/color",
+          "title": "Success",
+          "description": "Success or positive text"
+        },
+        "warning": {
+          "$ref": "#/$defs/color",
+          "title": "Warning",
+          "description": "Warning or caution text"
+        },
+        "info": {
+          "$ref": "#/$defs/color",
+          "title": "Info",
+          "description": "Informational text"
+        }
+      }
+    },
+    "border": {
+      "type": "object",
+      "description": "Borders",
+      "additionalProperties": false,
+      "required": [
+        "subtle",
+        "strong",
+        "accent",
+        "danger",
+        "success",
+        "warning",
+        "info"
+      ],
+      "properties": {
+        "subtle": {
+          "$ref": "#/$defs/color",
+          "title": "Subtle",
+          "description": "A hairline divider, separator, or card outline"
+        },
+        "strong": {
+          "$ref": "#/$defs/color",
+          "title": "Strong",
+          "description": "The outline of an input, button, or control that needs to stand out"
+        },
+        "accent": {
+          "$ref": "#/$defs/color",
+          "title": "Accent",
+          "description": "A focus ring, a selected or active outline, or a brand-colored border"
+        },
+        "danger": {
+          "$ref": "#/$defs/color",
+          "title": "Danger",
+          "description": "An error or destructive border"
+        },
+        "success": {
+          "$ref": "#/$defs/color",
+          "title": "Success",
+          "description": "A success border"
+        },
+        "warning": {
+          "$ref": "#/$defs/color",
+          "title": "Warning",
+          "description": "A warning border"
+        },
+        "info": {
+          "$ref": "#/$defs/color",
+          "title": "Info",
+          "description": "An informational border"
+        }
+      }
+    },
+    "textOnFill": {
+      "type": "object",
+      "description": "Text on solid fills",
+      "additionalProperties": false,
+      "required": [
+        "accent",
+        "danger",
+        "success",
+        "warning",
+        "info"
+      ],
+      "properties": {
+        "accent": {
+          "$ref": "#/$defs/color",
+          "title": "On accent",
+          "description": "Text and icons on a solid accent fill"
+        },
+        "danger": {
+          "$ref": "#/$defs/color",
+          "title": "On danger",
+          "description": "Text and icons on a solid danger fill"
+        },
+        "success": {
+          "$ref": "#/$defs/color",
+          "title": "On success",
+          "description": "Text and icons on a solid success fill"
+        },
+        "warning": {
+          "$ref": "#/$defs/color",
+          "title": "On warning",
+          "description": "Text and icons on a solid warning fill"
+        },
+        "info": {
+          "$ref": "#/$defs/color",
+          "title": "On info",
+          "description": "Text and icons on a solid info fill"
+        }
+      }
+    },
+    "interface": {
+      "type": "object",
+      "description": "Browser interface",
+      "additionalProperties": false,
+      "required": [
+        "visitedLink",
+        "selection",
+        "selectionText",
+        "scrollbarThumb",
+        "scrollbarTrack"
+      ],
+      "properties": {
+        "visitedLink": {
+          "$ref": "#/$defs/color",
+          "title": "Visited link",
+          "description": "Links you have already opened"
+        },
+        "selection": {
+          "$ref": "#/$defs/color",
+          "title": "Selection",
+          "description": "Background of selected text"
+        },
+        "selectionText": {
+          "$ref": "#/$defs/color",
+          "title": "Selection text",
+          "description": "Selected text itself"
+        },
+        "scrollbarThumb": {
+          "$ref": "#/$defs/color",
+          "title": "Scrollbar thumb",
+          "description": "The part of the scrollbar you drag"
+        },
+        "scrollbarTrack": {
+          "$ref": "#/$defs/color",
+          "title": "Scrollbar track",
+          "description": "The groove the scrollbar thumb runs in"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "color": {
+      "type": "string",
+      "description": "A CSS color: #rgb, #rrggbb, #rrggbbaa, rgb(), rgba(), or oklch()."
+    }
+  }
+}

@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Theme editor — Universal Theme</title>
+    <link rel="stylesheet" href="ui.css" />
+    <style>
+      body { padding: 0 16px 48px; }
+      .bar {
+        position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+        padding: 12px 0; background: var(--bg0); border-bottom: 1px solid var(--bg2);
+      }
+      .bar h1 { flex: 1; min-width: 160px; }
+      .bar .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+      #messages { margin: 12px 0 0; }
+      #messages:empty { display: none; }
+      #messages .notice { margin: 0; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+      #messages ul { margin: 4px 0 0; padding-left: 18px; }
+
+      .editor { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 420px); gap: 24px; margin-top: 16px; align-items: start; }
+      @media (max-width: 860px) { .editor { grid-template-columns: 1fr; } .preview-pane { position: static !important; } }
+      .card { background: var(--bg1); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+      .card input[type='text'] { background: var(--bg0); }
+      .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+      .meta .field { margin: 0; }
+      fieldset.mode { border: 0; padding: 0; margin: 0; display: flex; gap: 16px; align-items: end; }
+      fieldset.mode legend { color: var(--fg4); font-size: 12px; padding: 0; margin-bottom: 4px; }
+      fieldset.mode label { display: flex; gap: 6px; align-items: center; }
+
+      .group h2 { margin-bottom: 4px; }
+      .group > p { margin: 0 0 12px; }
+      .color-row { display: grid; grid-template-columns: 36px 150px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 0; border-top: 1px solid var(--bg2); }
+      .color-row:first-of-type { border-top: 0; }
+      .color-row input[type='color'] { width: 36px; height: 30px; padding: 0; border: 1px solid var(--bg3); border-radius: 6px; background: none; cursor: pointer; }
+      .color-row input.value { font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace; font-size: 12px; }
+      .color-row input.value[aria-invalid='true'] { border-color: var(--red); outline-color: var(--red); }
+      .color-row .about { min-width: 0; }
+      .color-row .about label { color: var(--fg0); display: block; }
+      .color-row .about small { color: var(--fg4); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .color-row button.auto { padding: 2px 8px; font-size: 11px; border-radius: 999px; }
+      .color-row button.auto[aria-pressed='true'] { background: #3d3423; color: var(--yellow); }
+      @media (max-width: 560px) { .color-row { grid-template-columns: 36px 1fr auto; } .color-row .about { grid-column: 1 / -1; order: -1; } }
+
+      .preview-pane { position: sticky; top: 72px; }
+      .checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 12px; }
+      .checks li { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+      .checks .ratio { font-variant-numeric: tabular-nums; }
+      .checks .low { color: var(--yellow); }
+      .checks .bad { color: var(--red); }
+      .checks .good { color: var(--green); }
+
+      /* The preview: styled only through the theme's variables, like pages are. */
+      .pv { border-radius: 8px; overflow: hidden; margin-bottom: 16px; background: var(--ute-bg-page); color: var(--ute-fg-text); border: 1px solid var(--bg3); font-size: 13px; }
+      .pv-bar { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--ute-bg-surface); border-bottom: 1px solid var(--ute-bd-subtle); }
+      .pv-bar strong { color: var(--ute-fg-strong); }
+      .pv-nav { display: flex; gap: 10px; flex: 1; }
+      .pv a { color: var(--ute-fg-link); text-decoration: underline; cursor: default; }
+      .pv a.pv-visited { color: var(--ute-visited); }
+      .pv-page { padding: 12px; display: grid; gap: 10px; }
+      .pv h3 { margin: 0; color: var(--ute-fg-strong); font-size: 16px; }
+      .pv p { margin: 0; }
+      .pv-muted { color: var(--ute-fg-muted); }
+      .pv-faint { color: var(--ute-fg-faint); }
+      .pv mark { background: var(--ute-bg-highlight); color: inherit; }
+      .pv code { background: var(--ute-bg-code); padding: 1px 4px; border-radius: 4px; font-size: 12px; }
+      .pv-card { background: var(--ute-bg-raised); border: 1px solid var(--ute-bd-subtle); border-radius: 8px; padding: 10px; display: grid; gap: 8px; }
+      .pv-card .pv-title { color: var(--ute-fg-strong); font-weight: 600; }
+      .pv-input { background: var(--ute-bg-input); border: 1px solid var(--ute-bd-strong); border-radius: 6px; padding: 5px 8px; color: var(--ute-fg-faint); }
+      .pv-input.focus { border-color: var(--ute-bd-accent); box-shadow: 0 0 0 1px var(--ute-bd-accent); color: var(--ute-fg-text); }
+      .pv-row { display: flex; gap: 6px; flex-wrap: wrap; }
+      .pv-btn { border-radius: 6px; padding: 4px 10px; font-size: 12px; }
+      .pv-control { background: var(--ute-bg-control); color: var(--ute-fg-text); }
+      .pv-fill-accent { background: var(--ute-bg-accent); color: var(--ute-on-accent); }
+      .pv-fill-danger { background: var(--ute-bg-danger); color: var(--ute-on-danger); }
+      .pv-fill-success { background: var(--ute-bg-success); color: var(--ute-on-success); }
+      .pv-fill-warning { background: var(--ute-bg-warning); color: var(--ute-on-warning); }
+      .pv-fill-info { background: var(--ute-bg-info); color: var(--ute-on-info); }
+      .pv-tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--ute-bd-subtle); }
+      .pv-tab { padding: 4px 10px; color: var(--ute-fg-muted); border-radius: 6px 6px 0 0; }
+      .pv-tab.selected { background: var(--ute-bg-selected); color: var(--ute-fg-strong); }
+      .pv-tab.accent { color: var(--ute-fg-accent); border-bottom: 2px solid var(--ute-bd-accent); }
+      .pv-alert { border-radius: 6px; padding: 6px 10px; border-left: 3px solid; }
+      .pv-alert.info { background: var(--ute-bg-info-soft); border-color: var(--ute-bd-info); }
+      .pv-alert.info b { color: var(--ute-fg-info); }
+      .pv-alert.success { background: var(--ute-bg-success-soft); border-color: var(--ute-bd-success); }
+      .pv-alert.success b { color: var(--ute-fg-success); }
+      .pv-alert.warning { background: var(--ute-bg-warning-soft); border-color: var(--ute-bd-warning); }
+      .pv-alert.warning b { color: var(--ute-fg-warning); }
+      .pv-alert.danger { background: var(--ute-bg-danger-soft); border-color: var(--ute-bd-danger); }
+      .pv-alert.danger b { color: var(--ute-fg-danger); }
+      .pv-alert.accent { background: var(--ute-bg-accent-soft); border-color: var(--ute-bd-accent); }
+      .pv-alert.accent b { color: var(--ute-fg-accent); }
+      .pv-divider { border: 0; height: 1px; background: var(--ute-bg-divider); margin: 0; }
+      .pv-selection { background: var(--ute-selection-bg); color: var(--ute-selection-fg); }
+      .pv-canvas-row { display: grid; gap: 4px; }
+      .pv-canvas-row canvas { width: 100%; height: auto; border-radius: 4px; }
+      .pv-overlay { position: relative; background: var(--ute-bg-overlay); border-radius: 6px; padding: 14px; display: grid; place-items: center; }
+      .pv-dialog { background: var(--ute-bg-raised); border: 1px solid var(--ute-bd-subtle); border-radius: 8px; padding: 8px 12px; color: var(--ute-fg-text); }
+      .pv-scroll { height: 36px; overflow-y: scroll; scrollbar-color: var(--ute-scrollbar); border: 1px solid var(--ute-bd-subtle); border-radius: 4px; padding: 0 6px; }
+
+      dialog { background: var(--bg1); color: var(--fg1); border: 1px solid var(--bg3); border-radius: 8px; width: min(640px, 90vw); }
+      dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
+      dialog textarea { width: 100%; min-height: 280px; background: var(--bg0); color: var(--fg1); border: 1px solid var(--bg3); border-radius: 6px; font: 12px ui-monospace, Menlo, monospace; padding: 8px; }
+      dialog .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; flex-wrap: wrap; }
+      dialog .errors { color: var(--red); margin: 8px 0 0; padding-left: 18px; }
+    </style>
+  </head>
+  <body>
+    <header class="bar">
+      <a href="options.html" id="back">← Settings</a>
+      <h1 id="title">New theme</h1>
+      <div class="actions">
+        <button type="button" id="import">Import JSON</button>
+        <button type="button" id="export">Export JSON</button>
+        <button type="button" id="save" class="primary">Save theme</button>
+      </div>
+    </header>
+    <div id="messages" role="status" aria-live="polite"></div>
+
+    <main class="editor">
+      <form id="form" novalidate>
+        <section class="card meta">
+          <div class="field">
+            <label for="name">Name</label>
+            <input id="name" type="text" maxlength="60" required />
+          </div>
+          <div class="field">
+            <label for="family">Family <span class="muted">(optional)</span></label>
+            <input id="family" type="text" maxlength="40" placeholder="Groups your themes in pickers" />
+          </div>
+          <fieldset class="mode">
+            <legend>Mode</legend>
+            <label><input type="radio" name="mode" value="dark" /> Dark</label>
+            <label><input type="radio" name="mode" value="light" /> Light</label>
+          </fieldset>
+          <div class="field" id="start-field">
+            <label for="start-from">Start from</label>
+            <div id="start-picker"></div>
+          </div>
+        </section>
+        <div id="groups"></div>
+      </form>
+
+      <aside class="preview-pane" aria-label="Preview">
+        <div id="preview" class="pv">
+          <div class="pv-bar">
+            <strong>Example</strong>
+            <span class="pv-nav"><a>Home</a><a>Docs</a><a class="pv-visited">Visited</a></span>
+            <span class="pv-btn pv-fill-accent">Sign in</span>
+          </div>
+          <div class="pv-page">
+            <h3>A page in your theme</h3>
+            <p>Body text with a <a>link</a>, <mark>highlighted words</mark>, and <code>inline code</code>.</p>
+            <p class="pv-muted">Muted caption · <span class="pv-faint">faint hint</span></p>
+            <div class="pv-card">
+              <div class="pv-title">Card</div>
+              <div class="pv-input">Search…</div>
+              <div class="pv-input focus">Focused input</div>
+              <div class="pv-row">
+                <span class="pv-btn pv-control">Cancel</span>
+                <span class="pv-btn pv-fill-accent">Save</span>
+                <span class="pv-btn pv-fill-success">Done</span>
+                <span class="pv-btn pv-fill-warning">Check</span>
+                <span class="pv-btn pv-fill-info">Info</span>
+                <span class="pv-btn pv-fill-danger">Delete</span>
+              </div>
+              <div class="pv-tabs"><span class="pv-tab selected">Selected</span><span class="pv-tab accent">Active</span><span class="pv-tab">Tab</span></div>
+            </div>
+            <div class="pv-alert accent"><b>Note</b> — an accent tint.</div>
+            <div class="pv-alert info"><b>Info</b> — something to know.</div>
+            <div class="pv-alert success"><b>Success</b> — it worked.</div>
+            <div class="pv-alert warning"><b>Warning</b> — careful now.</div>
+            <div class="pv-alert danger"><b>Error</b> — something broke.</div>
+            <hr class="pv-divider" />
+            <p><span class="pv-selection">Selected text</span> next to normal text.</p>
+            <div class="pv-scroll">Scrollbar<br />two<br />three<br />four<br />five</div>
+            <div class="pv-canvas-row">
+              <span class="pv-muted">A spreadsheet canvas, re-tinted as line art:</span>
+              <canvas id="pv-canvas" width="360" height="96"></canvas>
+            </div>
+            <div class="pv-overlay"><div class="pv-dialog">A dialog over the dimmed page</div></div>
+          </div>
+        </div>
+        <section class="card">
+          <h2>Legibility</h2>
+          <ul id="checks" class="checks"></ul>
+        </section>
+      </aside>
+    </main>
+
+    <dialog id="import-dialog">
+      <h2>Import a theme</h2>
+      <p class="muted">Paste theme JSON or choose a .json file. It opens here as a new theme; nothing is saved until you save it.</p>
+      <textarea id="import-text" spellcheck="false" aria-label="Theme JSON"></textarea>
+      <ul id="import-errors" class="errors"></ul>
+      <div class="actions">
+        <input id="import-file" type="file" accept=".json,application/json" />
+        <button type="button" id="import-cancel">Cancel</button>
+        <button type="button" id="import-load" class="primary">Open in editor</button>
+      </div>
+    </dialog>
+
+    <dialog id="export-dialog">
+      <h2>Export theme</h2>
+      <textarea id="export-text" readonly spellcheck="false" aria-label="Theme JSON"></textarea>
+      <div class="actions">
+        <button type="button" id="export-close">Close</button>
+        <button type="button" id="export-download">Download .json</button>
+        <button type="button" id="export-copy" class="primary">Copy</button>
+      </div>
+    </dialog>
+
+    <script src="editor.js"></script>
+  </body>
+</html>

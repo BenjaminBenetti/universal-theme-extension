@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "gruvbox-light-hard",
+  "name": "Gruvbox Light Hard",
+  "family": "Gruvbox",
+  "mode": "light",
+  "background": {
+    "page": "#f9f5d7",
+    "surface": "#f2e8c5",
+    "raised": "#ebdbb2",
+    "input": "#fcfaeb",
+    "control": "#d5c4a1",
+    "selected": "#bdae93",
+    "code": "#f1e5c1",
+    "accent": "#d79921",
+    "danger": "#cc241d",
+    "success": "#98971a",
+    "warning": "#d65d0e",
+    "info": "#458588",
+    "highlight": "#edd597",
+    "divider": "#d5c4a1",
+    "overlay": "rgba(40, 40, 40, 0.35)",
+    "accent-soft": "#f2e1af",
+    "danger-soft": "#efc7ae",
+    "success-soft": "#e4e0ad",
+    "warning-soft": "#f1d4ab",
+    "info-soft": "#d1dcc6"
+  },
+  "text": {
+    "text": "#3c3836",
+    "strong": "#282828",
+    "muted": "#7c6f64",
+    "faint": "#928374",
+    "link": "#076678",
+    "on-accent": "#282828",
+    "accent": "#b57614",
+    "danger": "#9d0006",
+    "success": "#79740e",
+    "warning": "#af3a03",
+    "info": "#427b58"
+  },
+  "border": {
+    "subtle": "#d5c4a1",
+    "strong": "#a89984",
+    "accent": "#b57614",
+    "danger": "#9d0006",
+    "success": "#79740e",
+    "warning": "#af3a03",
+    "info": "#076678"
+  },
+  "textOnFill": {
+    "accent": "#282828",
+    "danger": "#f9f5d7",
+    "success": "#282828",
+    "warning": "#282828",
+    "info": "#f9f5d7"
+  },
+  "interface": {
+    "visitedLink": "#8f3f71",
+    "selection": "#bdae93",
+    "selectionText": "#282828",
+    "scrollbarThumb": "#bdae93",
+    "scrollbarTrack": "#f9f5d7"
+  }
+}

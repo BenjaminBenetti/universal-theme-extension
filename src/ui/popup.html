@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Universal Theme</title>
+    <link rel="stylesheet" href="ui.css" />
+    <style>
+      body { width: 320px; min-height: 420px; padding: 14px; }
+      header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+      #host { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; }
+      #status { margin: 4px 0 12px; font-size: 12px; }
+      .row { display: flex; gap: 8px; }
+      .row button { flex: 1; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Universal Theme</h1>
+      <span id="host" class="muted"></span>
+    </header>
+    <div id="no-key" class="notice" hidden>
+      Add your Jev API key to start theming.
+      <div style="margin-top: 8px"><button id="add-key" class="primary">Open settings</button></div>
+    </div>
+    <div class="field">
+      <label for="site-theme">This site</label>
+      <div id="site-picker"></div>
+    </div>
+    <div class="field">
+      <label for="default-theme">All other sites</label>
+      <div id="default-picker"></div>
+    </div>
+    <div id="status" class="muted"></div>
+    <div class="row">
+      <button id="relayout" title="Forget Jev's labels for this site and let Jev lay it out again">Re-layout site</button>
+      <button id="settings">Settings</button>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>

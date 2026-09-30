@@ -1,0 +1,26 @@
+{
+  "name": "universal-theme-extension",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Apply color themes to any website, with Jev deciding what every element is.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "watch": "node scripts/build.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "npm run build && playwright test",
+    "screenshots": "npm run build && node scripts/screenshots.ts",
+    "smoke": "npm run build && node scripts/smoke.ts",
+    "schema": "node scripts/write-schema.mjs",
+    "ui-screenshots": "npm run build && node scripts/ui-screenshots.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/chrome": "^0.3.4",
+    "@types/node": "^26.6.3",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.2"
+  }
+}
