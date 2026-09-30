@@ -557,6 +557,7 @@ function apply(el: Element, plans: Plan[]) {
       setAttr(el, 'data-ute-g', l.graphic);
       setAttr(el, 'data-ute-paper', l.graphic === 'lineart' ? plan.paper : undefined);
       setAttr(el, 'data-ute-paint', plan.paint);
+      setAttr(el, 'data-ute-cover', plan.cover !== undefined ? '' : undefined);
     }
   }
   for (const prefix of ['data-ute-before', 'data-ute-after']) {

@@ -35,8 +35,6 @@ export interface Job {
   ask: Ask;
   /** Code-measured: the background is a pale tint, so soft-capable tokens use their "-soft" variant. */
   softBg: boolean;
-  /** Code-measured: fixed or sticky with a background, so it covers the page scrolling under it. */
-  covers?: boolean;
 }
 
 export interface Plan {
@@ -58,6 +56,12 @@ export interface Plan {
    * re-tinted so its paper becomes the theme's page color and its ink the theme's text color.
    */
   paper?: 'light' | 'dark';
+  /**
+   * Code-measured: a fixed or sticky box with a background, so page content scrolls under it.
+   * Where it has no color of its own (it matches what it sits on, or Jev says it blends in), it
+   * takes the color of what it sits on instead of turning see-through.
+   */
+  cover?: true;
 }
 
 const WHITE: RGBA = { r: 255, g: 255, b: 255, a: 1 };
@@ -231,15 +235,13 @@ export class MeasurePass {
       sigParts.push(`ink:${toHex(bg!)}`);
     } else if (!isTransparent(bg)) {
       // Background: only a decision when the box paints something distinct, or looks like a box.
-      // A fixed or sticky box always paints something: the page scrolls underneath it, so what is
-      // behind it now (often the same color) is not what it has to cover.
       radius = parseFloat(cs.borderTopLeftRadius) || 0;
       shadow = cs.boxShadow !== 'none';
       const distinct = !sameColor(composite(bg!, backdrop), backdrop, 3);
-      if (distinct || radius > 0 || shadow || isControl || floats) {
+      if (distinct || radius > 0 || shadow || isControl) {
         ask.bg = true;
         facts.background = `${describeColor(bg)}, ${describeRelation(bg!, backdrop)}`;
-        sigParts.push(`bg:${toHex(bg!)}/${bg!.a.toFixed(2)}${floats ? '/floats' : ''}`);
+        sigParts.push(`bg:${toHex(bg!)}/${bg!.a.toFixed(2)}`);
       }
     }
 
@@ -263,7 +265,8 @@ export class MeasurePass {
       }
     }
 
-    if (!ask.bg && !ask.fg && !ask.ink && !ask.border && !ask.graphic) return { el, pseudo, bgImage };
+    const cover = floats && !pseudo && !isTransparent(bg) ? { cover: true as const } : {};
+    if (!ask.bg && !ask.fg && !ask.ink && !ask.border && !ask.graphic) return { el, pseudo, bgImage, ...cover };
 
     // Only boxes that need a decision pay for layout and text reads.
     const rect = el.getBoundingClientRect();
@@ -280,7 +283,7 @@ export class MeasurePass {
     if (inside) facts.inside = inside;
     facts.size = rect.width || rect.height ? `${Math.round(rect.width)}×${Math.round(rect.height)} px (${sizeClass})` : 'not currently visible';
     if (look.words) facts.look = look.words;
-    if (floats) facts.position = `${cs.position} on screen; the page scrolls underneath it`;
+    if (floats) facts.position = `${cs.position} on screen`;
     if (opacity < 0.05) facts.opacity = '0% (invisible until hovered, focused, or activated)';
     else if (opacity < 1) facts.opacity = `${Math.round(opacity * 100)}%`;
     if (cs.visibility === 'hidden') facts.visibility = 'hidden until activated';
@@ -292,7 +295,8 @@ export class MeasurePass {
       bgImage,
       ...(paper ? { paper } : {}),
       ...(retry ? { retry: true as const } : {}),
-      job: { sig: sigParts.join('|'), facts: { site: this.host, page: this.page, ...facts }, ask, softBg, ...(floats && ask.bg ? { covers: true } : {}) },
+      ...cover,
+      job: { sig: sigParts.join('|'), facts: { site: this.host, page: this.page, ...facts }, ask, softBg },
     };
   }
 

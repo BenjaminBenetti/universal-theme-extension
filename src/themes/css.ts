@@ -112,7 +112,7 @@ function sharedCss(tokens: ReturnType<typeof tokenNames>, scope: 'document' | 's
 
   if (scope === 'document') {
     // The canvas.
-    rule(`${ON}${M}`, 'background-color: var(--ute-bg-page) !important; color: var(--ute-fg-text) !important');
+    rule(`${ON}${M}`, 'background-color: var(--ute-bg-page) !important; color: var(--ute-fg-text) !important; --ute-behind: var(--ute-bg-page)');
     rule(ON, 'scrollbar-color: var(--ute-scrollbar) !important; accent-color: var(--ute-bd-accent) !important');
   }
   rule(
@@ -144,12 +144,19 @@ function sharedCss(tokens: ReturnType<typeof tokenNames>, scope: 'document' | 's
 
   // Token → color. One attribute per selector so the browser only checks elements that carry it.
   for (const { suffix, attr } of BOXES) {
-    for (const token of tokens.bg) rule(`${ON} [${attr}-bg="${token}"]${M}${suffix}`, `background-color: var(--ute-bg-${token}) !important`);
+    for (const token of tokens.bg) {
+      // --ute-behind: the color this box's content sits on, for fixed and sticky boxes inside it.
+      const behind = suffix ? '' : `; --ute-behind: var(--ute-bg-${token})`;
+      rule(`${ON} [${attr}-bg="${token}"]${M}${suffix}`, `background-color: var(--ute-bg-${token}) !important${behind}`);
+    }
     for (const token of tokens.fg) rule(`${ON} [${attr}-fg="${token}"]${M}${suffix}`, `color: var(--ute-fg-${token}) !important`);
     for (const token of tokens.border) rule(`${ON} [${attr}-bd="${token}"]${M}${suffix}`, `border-color: var(--ute-bd-${token}) !important`);
     for (const token of tokens.fg) rule(`${ON} [${attr}-ink="${token}"]${M}${suffix}`, `background-color: var(--ute-fg-${token}) !important`);
   }
   rule(`${ON} a[data-ute-fg="link"]${M}:visited`, 'color: var(--ute-visited) !important');
+  // A fixed or sticky box with no color of its own stays solid, in the color of what it sits on:
+  // page content scrolls underneath it.
+  rule(`${ON} [data-ute-cover]${M}:where(:not([data-ute-bg]), [data-ute-bg="inherit"])`, 'background-color: var(--ute-behind, var(--ute-bg-page)) !important');
 
   // Legibility guard (must come after the fg rules): text on a solid fill always uses that fill's
   // on-color, and labeled text inside it inherits instead of keeping a color picked for the page.

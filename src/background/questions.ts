@@ -16,12 +16,6 @@ const TASK =
 
 type Kind = keyof Required<Job['ask']>;
 
-/**
- * Background roles for a box the page scrolls under (a fixed header bar): every role but
- * "inherit", which would make it see-through. Jev still picks which role it is.
- */
-const COVERING_BG: Record<string, string> = Object.fromEntries(Object.entries(BG_TOKENS).filter(([token]) => token !== 'inherit'));
-
 function instructions(kind: Kind, id: string, job: Job): string {
   const about = `About element ${id} only:`;
   switch (kind) {
@@ -59,7 +53,7 @@ export function buildRequest(host: string, page: string, jobs: Job[]): BuiltRequ
     const { site: _site, page: _page, ...facts } = job.facts;
     elements[id] = facts;
     for (const kind of Object.keys(job.ask) as Kind[]) {
-      questions[`${id}_${kind}`] = { type: 'choice', instructions: instructions(kind, id, job), criteria: kind === 'bg' && job.covers ? COVERING_BG : CRITERIA[kind] };
+      questions[`${id}_${kind}`] = { type: 'choice', instructions: instructions(kind, id, job), criteria: CRITERIA[kind] };
     }
   });
   return { state: { task: TASK, site: host, page, elements }, questions };

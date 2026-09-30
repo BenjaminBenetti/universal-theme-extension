@@ -51,7 +51,7 @@ describe('shadow root stylesheet', () => {
   const css = shadowCss();
 
   it('uses the same token rules without the document-level guard', () => {
-    expect(css).toContain('[data-ute-bg="raised"]:not([data-ute-m]) { background-color: var(--ute-bg-raised) !important }');
+    expect(css).toContain('[data-ute-bg="raised"]:not([data-ute-m]) { background-color: var(--ute-bg-raised) !important; --ute-behind: var(--ute-bg-raised) }');
     expect(css).not.toContain(':root[data-ute-theme]');
   });
 

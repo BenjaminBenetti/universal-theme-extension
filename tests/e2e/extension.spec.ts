@@ -87,12 +87,18 @@ test('switching themes recolors the open page without calling Jev', async () => 
   expect(jev.calls).toBe(calls);
 });
 
-test('a fixed header the same color as the page stays solid over content scrolling under it', async () => {
+test('fixed and sticky boxes that match what they sit on stay solid, in that color', async () => {
   await page.goto(`${jev.url}/fixed`);
   await waitForThemed(page);
-  // Unasked, it would be transparent and the tiles would show through it.
-  expect(await page.getAttribute('#bar', 'data-ute-bg')).toBe('raised');
-  expect(await css('#bar', 'backgroundColor')).toBe(DARK.raised);
+  // Nothing to ask Jev: they match what is behind them. See-through, the tiles scrolling under
+  // them would show; a role of their own (a header bar's) would paint a band that was never there.
+  expect(await page.getAttribute('#bar', 'data-ute-bg')).toBeNull();
+  expect(await page.getAttribute('#bar', 'data-ute-cover')).toBe('');
+  expect(await css('#bar', 'backgroundColor')).toBe(await css('body', 'backgroundColor'));
+  expect(await css('#bar', 'backgroundColor')).not.toBe('rgba(0, 0, 0, 0)');
+  expect(await page.getAttribute('#month', 'data-ute-cover')).toBe('');
+  expect(await css('#card', 'backgroundColor')).toBe(DARK.accent);
+  expect(await css('#month', 'backgroundColor')).toBe(DARK.accent);
 });
 
 test('a site set to off is left exactly as the site made it', async () => {
