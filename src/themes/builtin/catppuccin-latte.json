@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "catppuccin-latte",
+  "name": "Catppuccin Latte",
+  "family": "Catppuccin",
+  "mode": "light",
+  "background": {
+    "page": "#eff1f5",
+    "surface": "#e6e9ef",
+    "raised": "#dce0e8",
+    "input": "#ccd0da",
+    "control": "#ccd0da",
+    "selected": "#bcc0cc",
+    "code": "#e6e9ef",
+    "accent": "#8839ef",
+    "danger": "#d20f39",
+    "success": "#3d9d28",
+    "warning": "#df8e1d",
+    "info": "#1e66f5",
+    "highlight": "#a9daf0",
+    "divider": "#bcc0cc",
+    "overlay": "rgba(76, 79, 105, 0.35)",
+    "accent-soft": "#d8c9f4",
+    "danger-soft": "#e9bfcc",
+    "success-soft": "#c8dfc8",
+    "warning-soft": "#ebdbc5",
+    "info-soft": "#c1d2f5"
+  },
+  "text": {
+    "text": "#4c4f69",
+    "strong": "#4c4f69",
+    "muted": "#6c6f85",
+    "faint": "#8c8fa1",
+    "link": "#1e66f5",
+    "on-accent": "#eff1f5",
+    "accent": "#8839ef",
+    "danger": "#d20f39",
+    "success": "#3d9d28",
+    "warning": "#c77700",
+    "info": "#1e66f5"
+  },
+  "border": {
+    "subtle": "#bcc0cc",
+    "strong": "#9ca0b0",
+    "accent": "#8839ef",
+    "danger": "#d20f39",
+    "success": "#3d9d28",
+    "warning": "#c77700",
+    "info": "#1e66f5"
+  },
+  "textOnFill": {
+    "accent": "#eff1f5",
+    "danger": "#eff1f5",
+    "success": "#eff1f5",
+    "warning": "#4c4f69",
+    "info": "#eff1f5"
+  },
+  "interface": {
+    "visitedLink": "#8839ef",
+    "selection": "#acb0be",
+    "selectionText": "#4c4f69",
+    "scrollbarThumb": "#acb0be",
+    "scrollbarTrack": "#eff1f5"
+  }
+}

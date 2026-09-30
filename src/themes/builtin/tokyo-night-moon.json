@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "tokyo-night-moon",
+  "name": "Tokyo Night Moon",
+  "family": "Tokyo Night",
+  "mode": "dark",
+  "background": {
+    "page": "#222436",
+    "surface": "#1e2030",
+    "raised": "#2f334d",
+    "input": "#2f334d",
+    "control": "#3b4261",
+    "selected": "#2d3f76",
+    "code": "#1e2030",
+    "accent": "#82aaff",
+    "danger": "#ff757f",
+    "success": "#c3e88d",
+    "warning": "#ffc777",
+    "info": "#0db9d7",
+    "highlight": "#3e68d7",
+    "divider": "#3b4261",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#353f5e",
+    "danger-soft": "#4e3445",
+    "success-soft": "#424b47",
+    "warning-soft": "#4e4543",
+    "info-soft": "#1e4256"
+  },
+  "text": {
+    "text": "#c8d3f5",
+    "strong": "#c8d3f5",
+    "muted": "#828bb8",
+    "faint": "#636da6",
+    "link": "#82aaff",
+    "on-accent": "#c8d3f5",
+    "accent": "#82aaff",
+    "danger": "#ff757f",
+    "success": "#c3e88d",
+    "warning": "#ffc777",
+    "info": "#0db9d7"
+  },
+  "border": {
+    "subtle": "#3b4261",
+    "strong": "#545c7e",
+    "accent": "#82aaff",
+    "danger": "#ff757f",
+    "success": "#c3e88d",
+    "warning": "#ffc777",
+    "info": "#0db9d7"
+  },
+  "textOnFill": {
+    "accent": "#222436",
+    "danger": "#222436",
+    "success": "#222436",
+    "warning": "#222436",
+    "info": "#222436"
+  },
+  "interface": {
+    "visitedLink": "#c099ff",
+    "selection": "#2d3f76",
+    "selectionText": "#c8d3f5",
+    "scrollbarThumb": "#3b4261",
+    "scrollbarTrack": "#222436"
+  }
+}

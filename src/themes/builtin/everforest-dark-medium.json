@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "everforest-dark-medium",
+  "name": "Everforest Dark Medium",
+  "family": "Everforest",
+  "mode": "dark",
+  "background": {
+    "page": "#2d353b",
+    "surface": "#343f44",
+    "raised": "#3d484d",
+    "input": "#3d484d",
+    "control": "#475258",
+    "selected": "#56635f",
+    "code": "#232a2e",
+    "accent": "#a7c080",
+    "danger": "#e67e80",
+    "success": "#a7c080",
+    "warning": "#dbbc7f",
+    "info": "#7fbbb3",
+    "highlight": "#4d4c43",
+    "divider": "#4f585e",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#425047",
+    "danger-soft": "#514045",
+    "success-soft": "#425047",
+    "warning-soft": "#4d4c43",
+    "info-soft": "#3a515d"
+  },
+  "text": {
+    "text": "#d3c6aa",
+    "strong": "#d3c6aa",
+    "muted": "#859289",
+    "faint": "#7a8478",
+    "link": "#7fbbb3",
+    "on-accent": "#d3c6aa",
+    "accent": "#a7c080",
+    "danger": "#e67e80",
+    "success": "#a7c080",
+    "warning": "#dbbc7f",
+    "info": "#7fbbb3"
+  },
+  "border": {
+    "subtle": "#4f585e",
+    "strong": "#859289",
+    "accent": "#a7c080",
+    "danger": "#e67e80",
+    "success": "#a7c080",
+    "warning": "#dbbc7f",
+    "info": "#7fbbb3"
+  },
+  "textOnFill": {
+    "accent": "#2d353b",
+    "danger": "#2d353b",
+    "success": "#2d353b",
+    "warning": "#2d353b",
+    "info": "#2d353b"
+  },
+  "interface": {
+    "visitedLink": "#d699b6",
+    "selection": "#543a48",
+    "selectionText": "#d3c6aa",
+    "scrollbarThumb": "#7a8478",
+    "scrollbarTrack": "#2d353b"
+  }
+}

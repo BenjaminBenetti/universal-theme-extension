@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "rose-pine-moon",
+  "name": "Rosé Pine Moon",
+  "family": "Rosé Pine",
+  "mode": "dark",
+  "background": {
+    "page": "#232136",
+    "surface": "#2a273f",
+    "raised": "#393552",
+    "input": "#2a273f",
+    "control": "#44415a",
+    "selected": "#56526e",
+    "code": "#2a273f",
+    "accent": "#ea9a97",
+    "danger": "#eb6f92",
+    "success": "#3e8fb0",
+    "warning": "#f6c177",
+    "info": "#9ccfd8",
+    "highlight": "#4d4143",
+    "divider": "#56526e",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#4b3949",
+    "danger-soft": "#4b3148",
+    "success-soft": "#28374e",
+    "warning-soft": "#4d4143",
+    "info-soft": "#3b4456"
+  },
+  "text": {
+    "text": "#e0def4",
+    "strong": "#e0def4",
+    "muted": "#908caa",
+    "faint": "#6e6a86",
+    "link": "#c4a7e7",
+    "on-accent": "#e0def4",
+    "accent": "#ea9a97",
+    "danger": "#eb6f92",
+    "success": "#3e8fb0",
+    "warning": "#f6c177",
+    "info": "#9ccfd8"
+  },
+  "border": {
+    "subtle": "#56526e",
+    "strong": "#6e6a86",
+    "accent": "#ea9a97",
+    "danger": "#eb6f92",
+    "success": "#3e8fb0",
+    "warning": "#f6c177",
+    "info": "#9ccfd8"
+  },
+  "textOnFill": {
+    "accent": "#232136",
+    "danger": "#232136",
+    "success": "#232136",
+    "warning": "#232136",
+    "info": "#232136"
+  },
+  "interface": {
+    "visitedLink": "#ea9a97",
+    "selection": "#44415a",
+    "selectionText": "#e0def4",
+    "scrollbarThumb": "#6e6a86",
+    "scrollbarTrack": "#232136"
+  }
+}

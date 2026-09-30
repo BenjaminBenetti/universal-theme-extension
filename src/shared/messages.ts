@@ -11,6 +11,12 @@ export interface LabelRequest {
 
 export type LabelResponse = { ok: true; labels: Record<string, Labels> } | { ok: false; error: string; fatal: boolean };
 
+/** Content script → background: the variables block of a built-in theme (a string, or '' if unknown). */
+export interface ThemeCssRequest {
+  type: 'theme-css';
+  id: string;
+}
+
 /** Content script → background: add the USER-origin copy of our stylesheet to this frame. */
 export interface InjectRequest {
   type: 'inject-user-css';
@@ -39,4 +45,4 @@ export interface TabStatus {
   error?: string;
 }
 
-export type Message = LabelRequest | InjectRequest | StatusReport | StatusQuery;
+export type Message = LabelRequest | ThemeCssRequest | InjectRequest | StatusReport | StatusQuery;

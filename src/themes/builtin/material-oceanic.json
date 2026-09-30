@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "material-oceanic",
+  "name": "Material Oceanic",
+  "family": "Material",
+  "mode": "dark",
+  "background": {
+    "page": "#25363b",
+    "surface": "#1c2c30",
+    "raised": "#314549",
+    "input": "#314549",
+    "control": "#355058",
+    "selected": "#395b65",
+    "code": "#2e3c43",
+    "accent": "#11bba3",
+    "danger": "#ff5370",
+    "success": "#c3e88d",
+    "warning": "#ffcb6b",
+    "info": "#82aaff",
+    "highlight": "#716b26",
+    "divider": "#355058",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#215150",
+    "danger-soft": "#513c46",
+    "success-soft": "#455a4b",
+    "warning-soft": "#515445",
+    "info-soft": "#384d62"
+  },
+  "text": {
+    "text": "#eeffff",
+    "strong": "#ffffff",
+    "muted": "#b0bec5",
+    "faint": "#546e7a",
+    "link": "#80cbc4",
+    "on-accent": "#ffffff",
+    "accent": "#11bba3",
+    "danger": "#ff5370",
+    "success": "#c3e88d",
+    "warning": "#ffcb6b",
+    "info": "#82aaff"
+  },
+  "border": {
+    "subtle": "#355058",
+    "strong": "#546e7a",
+    "accent": "#11bba3",
+    "danger": "#ff5370",
+    "success": "#c3e88d",
+    "warning": "#ffcb6b",
+    "info": "#82aaff"
+  },
+  "textOnFill": {
+    "accent": "#25363b",
+    "danger": "#25363b",
+    "success": "#25363b",
+    "warning": "#25363b",
+    "info": "#25363b"
+  },
+  "interface": {
+    "visitedLink": "#c792ea",
+    "selection": "#395b65",
+    "selectionText": "#ffffff",
+    "scrollbarThumb": "#3e5f64",
+    "scrollbarTrack": "#25363b"
+  }
+}

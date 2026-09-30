@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "tomorrow-night-bright",
+  "name": "Tomorrow Night Bright",
+  "family": "Tomorrow",
+  "mode": "dark",
+  "background": {
+    "page": "#000000",
+    "surface": "#2a2a2a",
+    "raised": "#2a2a2a",
+    "input": "#2a2a2a",
+    "control": "#424242",
+    "selected": "#4d5057",
+    "code": "#191919",
+    "accent": "#e7c547",
+    "danger": "#d54e53",
+    "success": "#b9ca4a",
+    "warning": "#e78c45",
+    "info": "#70c0b1",
+    "highlight": "#514519",
+    "divider": "#424242",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#2e270e",
+    "danger-soft": "#2b1011",
+    "success-soft": "#25280f",
+    "warning-soft": "#2e1c0e",
+    "info-soft": "#162623"
+  },
+  "text": {
+    "text": "#eaeaea",
+    "strong": "#eaeaea",
+    "muted": "#969896",
+    "faint": "#5a5b5a",
+    "link": "#7aa6da",
+    "on-accent": "#eaeaea",
+    "accent": "#e7c547",
+    "danger": "#d54e53",
+    "success": "#b9ca4a",
+    "warning": "#e78c45",
+    "info": "#70c0b1"
+  },
+  "border": {
+    "subtle": "#424242",
+    "strong": "#4d5057",
+    "accent": "#e7c547",
+    "danger": "#d54e53",
+    "success": "#b9ca4a",
+    "warning": "#e78c45",
+    "info": "#70c0b1"
+  },
+  "textOnFill": {
+    "accent": "#000000",
+    "danger": "#000000",
+    "success": "#000000",
+    "warning": "#000000",
+    "info": "#000000"
+  },
+  "interface": {
+    "visitedLink": "#c397d8",
+    "selection": "#424242",
+    "selectionText": "#eaeaea",
+    "scrollbarThumb": "#4d5057",
+    "scrollbarTrack": "#000000"
+  }
+}

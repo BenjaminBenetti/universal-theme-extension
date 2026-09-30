@@ -1,5 +1,7 @@
 import type { Message, LabelResponse, StatusReport } from '../shared/messages.ts';
-import { CUSTOM_THEMES_KEY, loadCustomThemes, loadSettings, SETTINGS_KEY } from '../shared/settings.ts';
+import { CUSTOM_THEMES_KEY, loadCustomThemes, loadSettings, SETTINGS_KEY, themeCssKey } from '../shared/settings.ts';
+import { compileTheme, themeVarsCss } from '../themes/css.ts';
+import { BUILTIN_THEMES } from '../themes/index.ts';
 import { writeLabels } from './cache.ts';
 import { JevError, systemOne, DEFAULT_API_BASE } from './jev.ts';
 import { buildRequest, MAX_JOBS_PER_REQUEST, parseAnswers } from './questions.ts';
@@ -8,6 +10,9 @@ import { syncBootCss } from './registration.ts';
 const sync = async () => syncBootCss(await loadSettings(), await loadCustomThemes());
 
 chrome.runtime.onInstalled.addListener(async (details) => {
+  // Built-in themes may have changed with this version: drop their compiled variables.
+  const stale = Object.keys(await chrome.storage.local.get(null)).filter((k) => k.startsWith('themeCss:'));
+  if (stale.length) await chrome.storage.local.remove(stale);
   await sync();
   if (details.reason === 'install' && !(await loadSettings()).apiKey) chrome.runtime.openOptionsPage();
 });
@@ -20,6 +25,9 @@ chrome.runtime.onMessage.addListener((message: Message, sender, sendResponse) =>
   switch (message.type) {
     case 'label':
       label(message.host, message.page, message.jobs).then(sendResponse);
+      return true;
+    case 'theme-css':
+      builtinThemeCss(message.id).then(sendResponse);
       return true;
     case 'inject-user-css':
       if (sender.tab?.id !== undefined) {
@@ -51,6 +59,15 @@ async function label(host: string, page: string, jobs: Parameters<typeof buildRe
     console.warn('[ute] labeling failed', err);
     return { ok: false, error: (err as Error).message, fatal };
   }
+}
+
+/** A built-in theme's variables, compiled once and kept in storage for content scripts to read. */
+async function builtinThemeCss(id: string): Promise<string> {
+  const theme = BUILTIN_THEMES.find((t) => t.id === id);
+  if (!theme) return '';
+  const css = themeVarsCss(compileTheme(theme));
+  await chrome.storage.local.set({ [themeCssKey(id)]: css });
+  return css;
 }
 
 function updateBadge(tabId: number, status: StatusReport) {

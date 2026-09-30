@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "catppuccin-macchiato",
+  "name": "Catppuccin Macchiato",
+  "family": "Catppuccin",
+  "mode": "dark",
+  "background": {
+    "page": "#24273a",
+    "surface": "#1e2030",
+    "raised": "#363a4f",
+    "input": "#363a4f",
+    "control": "#494d64",
+    "selected": "#5b6078",
+    "code": "#1e2030",
+    "accent": "#c6a0f6",
+    "danger": "#ed8796",
+    "success": "#a6da95",
+    "warning": "#eed49f",
+    "info": "#8aadf4",
+    "highlight": "#455c6d",
+    "divider": "#494d64",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#443f60",
+    "danger-soft": "#4c3a4c",
+    "success-soft": "#3e4b4c",
+    "warning-soft": "#4c4a4e",
+    "info-soft": "#38425f"
+  },
+  "text": {
+    "text": "#cad3f5",
+    "strong": "#cad3f5",
+    "muted": "#a5adcb",
+    "faint": "#8087a2",
+    "link": "#8aadf4",
+    "on-accent": "#24273a",
+    "accent": "#c6a0f6",
+    "danger": "#ed8796",
+    "success": "#a6da95",
+    "warning": "#eed49f",
+    "info": "#8aadf4"
+  },
+  "border": {
+    "subtle": "#494d64",
+    "strong": "#6e738d",
+    "accent": "#c6a0f6",
+    "danger": "#ed8796",
+    "success": "#a6da95",
+    "warning": "#eed49f",
+    "info": "#8aadf4"
+  },
+  "textOnFill": {
+    "accent": "#24273a",
+    "danger": "#24273a",
+    "success": "#24273a",
+    "warning": "#24273a",
+    "info": "#24273a"
+  },
+  "interface": {
+    "visitedLink": "#c6a0f6",
+    "selection": "#5b6078",
+    "selectionText": "#cad3f5",
+    "scrollbarThumb": "#5b6078",
+    "scrollbarTrack": "#24273a"
+  }
+}

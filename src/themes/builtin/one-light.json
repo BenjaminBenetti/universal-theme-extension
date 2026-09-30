@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "one-light",
+  "name": "One Light",
+  "family": "One",
+  "mode": "light",
+  "background": {
+    "page": "#fafafa",
+    "surface": "#eaeaeb",
+    "raised": "#f2f2f2",
+    "input": "#ffffff",
+    "control": "#e5e5e6",
+    "selected": "#dbdbdc",
+    "code": "#eaeaeb",
+    "accent": "#5871ef",
+    "danger": "#e45649",
+    "success": "#50a14f",
+    "warning": "#c18401",
+    "info": "#0184bc",
+    "highlight": "#d8defb",
+    "divider": "#dbdbdc",
+    "overlay": "rgba(56, 58, 66, 0.35)",
+    "accent-soft": "#d6dcf8",
+    "danger-soft": "#f5d6d3",
+    "success-soft": "#d5e6d4",
+    "warning-soft": "#ede0c3",
+    "info-soft": "#c3e0ec"
+  },
+  "text": {
+    "text": "#383a42",
+    "strong": "#232324",
+    "muted": "#696c77",
+    "faint": "#a0a1a7",
+    "link": "#4078f2",
+    "on-accent": "#ffffff",
+    "accent": "#304ee2",
+    "danger": "#ca1243",
+    "success": "#50a14f",
+    "warning": "#986801",
+    "info": "#0184bc"
+  },
+  "border": {
+    "subtle": "#dbdbdc",
+    "strong": "#a0a1a7",
+    "accent": "#556de8",
+    "danger": "#e45649",
+    "success": "#50a14f",
+    "warning": "#c18401",
+    "info": "#0184bc"
+  },
+  "textOnFill": {
+    "accent": "#ffffff",
+    "danger": "#232324",
+    "success": "#232324",
+    "warning": "#232324",
+    "info": "#fafafa"
+  },
+  "interface": {
+    "visitedLink": "#a626a4",
+    "selection": "#e5e5e6",
+    "selectionText": "#383a42",
+    "scrollbarThumb": "#c6c7c7",
+    "scrollbarTrack": "#fafafa"
+  }
+}

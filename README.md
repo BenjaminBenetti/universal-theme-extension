@@ -6,6 +6,12 @@ extension asks [Jev](https://docs.typesafe.ai) — TypeSafe AI's decision model 
 the page *is* (page, card, input, primary button, muted text, link, divider…), and the theme decides what
 color each of those roles gets.
 
+<img src="assets/icons/128.png" width="64" alt="Inky, a pink pixel octopus" align="right">
+
+Meet **Inky**, the mascot: a pixel octopus, because octopuses recolor themselves in a blink. Inky is
+the toolbar icon, drifts around the empty margins of the settings page (click for a heart), and
+bobs in the corner of the popup and theme editor.
+
 ## How it works
 
 - **Jev decides every color role; code never guesses.** Code measures each element's original colors and
@@ -84,8 +90,17 @@ Everything else a theme needs is derived when it is compiled: the crush color (i
 single-color icon tint, and the line-art filters. The line-art filters are exact SVG color matrices
 that map paper → page and ink → text.
 
-**Adding a built-in theme:** add a JSON file to `src/themes/builtin/` and import it in
-`src/themes/index.ts`. The build validates it and fails with the list of problems if it is incomplete.
+**Adding a built-in theme:**
+1. Write `src/themes/builtin/<id>.json`, giving the palette's own colors for everything except the
+   automatic ones.
+2. Run `npm run themes -- derive <file>` to fill in the soft tints and text-on-fill colors the same
+   way the editor does. It also puts keys in canonical order.
+3. Run `npm run themes -- check <file>` to validate the format and legibility. Every built-in theme
+   must pass: body text 4.5:1, muted text 3:1, text on fills 3:1, and so on.
+4. Run `npm run themes -- index` to add it to the generated list (`builtin/index.ts`). A unit test
+   fails if the list and the folder disagree.
+
+Pages only ever receive their active theme's colors, so shipping more themes costs pages nothing.
 
 **Making your own:** open **Settings → My themes → New theme** (or Duplicate a theme there).
 - You start from any theme and change its colors: color pickers and text fields for every token,
@@ -135,6 +150,8 @@ extension from `chrome://extensions` after rebuilding.
 | `npm run smoke -- <url> <theme> <out.png>` | One site, one theme, real Jev |
 | `npm run ui-screenshots` | Screenshots of the popup, settings page, and theme editor |
 | `npm run schema` | Regenerate `src/themes/theme.schema.json` from the theme format |
+| `npm run themes -- derive\|check\|index` | Tools for built-in theme files (see Themes) |
+| `npm run gallery -- [url] [settle-ms]` | One page in every built-in theme as a contact sheet, real Jev |
 
 The real-Jev scripts read the key from `TYPESAFE_API_KEY`, or from `JEV_KEY` in `secrets.env`
 (git-ignored).
@@ -151,7 +168,9 @@ The real-Jev scripts read the key from `TYPESAFE_API_KEY`, or from `JEV_KEY` in 
 - `src/themes/` has the theme format (`format.ts`), the built-in themes (`builtin/*.json`), the
   registry (`index.ts`), the CSS generator (`css.ts`), and the graphic filters (`filters.ts`).
 - `src/shared/` has the color math, the token vocabulary, settings, and messages.
-- `src/ui/` has the popup, the settings page, the theme editor, and the type-ahead theme picker.
+- `src/ui/` has the popup, the settings page, the theme editor, the type-ahead theme picker, and
+  Inky (`inky-sprite.ts` holds the pixels; `inky.ts` animates them). `npm run icons` redraws the
+  toolbar icons from the sprite, pixel for pixel.
 
 ## Known limitations
 

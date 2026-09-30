@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "kanagawa-lotus",
+  "name": "Kanagawa Lotus",
+  "family": "Kanagawa",
+  "mode": "light",
+  "background": {
+    "page": "#f2ecbc",
+    "surface": "#dcd5ac",
+    "raised": "#e7dba0",
+    "input": "#f2ecbc",
+    "control": "#e4d794",
+    "selected": "#9fb5c9",
+    "code": "#e5ddb0",
+    "accent": "#4d699b",
+    "danger": "#c84053",
+    "success": "#6f894e",
+    "warning": "#e98a00",
+    "info": "#5a7785",
+    "highlight": "#f9d791",
+    "divider": "#d5cea3",
+    "overlay": "rgba(67, 67, 108, 0.35)",
+    "accent-soft": "#cecfb5",
+    "danger-soft": "#e9c6a5",
+    "success-soft": "#d5d6a4",
+    "warning-soft": "#f0d693",
+    "info-soft": "#d1d2b0"
+  },
+  "text": {
+    "text": "#545464",
+    "strong": "#43436c",
+    "muted": "#716e61",
+    "faint": "#8a8980",
+    "link": "#4d699b",
+    "on-accent": "#43436c",
+    "accent": "#4d699b",
+    "danger": "#c84053",
+    "success": "#6f894e",
+    "warning": "#cc6d00",
+    "info": "#5a7785"
+  },
+  "border": {
+    "subtle": "#d5cea3",
+    "strong": "#716e61",
+    "accent": "#4d699b",
+    "danger": "#c84053",
+    "success": "#6f894e",
+    "warning": "#cc6d00",
+    "info": "#5a7785"
+  },
+  "textOnFill": {
+    "accent": "#f2ecbc",
+    "danger": "#f2ecbc",
+    "success": "#f2ecbc",
+    "warning": "#43436c",
+    "info": "#f2ecbc"
+  },
+  "interface": {
+    "visitedLink": "#624c83",
+    "selection": "#c9cbd1",
+    "selectionText": "#43436c",
+    "scrollbarThumb": "#a09cac",
+    "scrollbarTrack": "#f2ecbc"
+  }
+}

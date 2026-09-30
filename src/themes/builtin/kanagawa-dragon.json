@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "kanagawa-dragon",
+  "name": "Kanagawa Dragon",
+  "family": "Kanagawa",
+  "mode": "dark",
+  "background": {
+    "page": "#181616",
+    "surface": "#0d0c0c",
+    "raised": "#282727",
+    "input": "#282727",
+    "control": "#393836",
+    "selected": "#2d4f67",
+    "code": "#12120f",
+    "accent": "#8ba4b0",
+    "danger": "#e82424",
+    "success": "#98bb6c",
+    "warning": "#ff9e3b",
+    "info": "#658594",
+    "highlight": "#49443c",
+    "divider": "#393836",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#2f3235",
+    "danger-soft": "#421919",
+    "success-soft": "#323727",
+    "warning-soft": "#46311d",
+    "info-soft": "#272c2f"
+  },
+  "text": {
+    "text": "#c5c9c5",
+    "strong": "#dcd7ba",
+    "muted": "#737c73",
+    "faint": "#625e5a",
+    "link": "#949fb5",
+    "on-accent": "#dcd7ba",
+    "accent": "#8ba4b0",
+    "danger": "#e82424",
+    "success": "#98bb6c",
+    "warning": "#ff9e3b",
+    "info": "#658594"
+  },
+  "border": {
+    "subtle": "#393836",
+    "strong": "#54546d",
+    "accent": "#8ba4b0",
+    "danger": "#e82424",
+    "success": "#98bb6c",
+    "warning": "#ff9e3b",
+    "info": "#658594"
+  },
+  "textOnFill": {
+    "accent": "#181616",
+    "danger": "#181616",
+    "success": "#181616",
+    "warning": "#181616",
+    "info": "#181616"
+  },
+  "interface": {
+    "visitedLink": "#a292a3",
+    "selection": "#223249",
+    "selectionText": "#c5c9c5",
+    "scrollbarThumb": "#625e5a",
+    "scrollbarTrack": "#181616"
+  }
+}

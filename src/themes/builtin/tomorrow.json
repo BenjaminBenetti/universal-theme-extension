@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "tomorrow",
+  "name": "Tomorrow",
+  "family": "Tomorrow",
+  "mode": "light",
+  "background": {
+    "page": "#ffffff",
+    "surface": "#efefef",
+    "raised": "#efefef",
+    "input": "#ffffff",
+    "control": "#d6d6d6",
+    "selected": "#c0c1c0",
+    "code": "#f7f7f7",
+    "accent": "#eab700",
+    "danger": "#c82829",
+    "success": "#718c00",
+    "warning": "#f5871f",
+    "info": "#3e999f",
+    "highlight": "#eab700",
+    "divider": "#d6d6d6",
+    "overlay": "rgba(77, 77, 76, 0.35)",
+    "accent-soft": "#faefc7",
+    "danger-soft": "#f3d0d0",
+    "success-soft": "#e0e6c7",
+    "warning-soft": "#fde5ce",
+    "info-soft": "#d5e9ea"
+  },
+  "text": {
+    "text": "#4d4d4c",
+    "strong": "#4d4d4c",
+    "muted": "#8e908c",
+    "faint": "#bbbcba",
+    "link": "#4271ae",
+    "on-accent": "#4d4d4c",
+    "accent": "#b98700",
+    "danger": "#c82829",
+    "success": "#718c00",
+    "warning": "#de7200",
+    "info": "#3e999f"
+  },
+  "border": {
+    "subtle": "#d6d6d6",
+    "strong": "#8e908c",
+    "accent": "#b98700",
+    "danger": "#c82829",
+    "success": "#718c00",
+    "warning": "#f5871f",
+    "info": "#3e999f"
+  },
+  "textOnFill": {
+    "accent": "#4d4d4c",
+    "danger": "#ffffff",
+    "success": "#ffffff",
+    "warning": "#4d4d4c",
+    "info": "#ffffff"
+  },
+  "interface": {
+    "visitedLink": "#8959a8",
+    "selection": "#d6d6d6",
+    "selectionText": "#4d4d4c",
+    "scrollbarThumb": "#d1d1d1",
+    "scrollbarTrack": "#ffffff"
+  }
+}

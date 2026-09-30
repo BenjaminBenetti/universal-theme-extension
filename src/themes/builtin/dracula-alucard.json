@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "dracula-alucard",
+  "name": "Alucard",
+  "family": "Dracula",
+  "mode": "light",
+  "background": {
+    "page": "#fffbeb",
+    "surface": "#ece9df",
+    "raised": "#efeddc",
+    "input": "#ece9df",
+    "control": "#dedccf",
+    "selected": "#cfcfde",
+    "code": "#ece9df",
+    "accent": "#644ac9",
+    "danger": "#cb3a2a",
+    "success": "#14710a",
+    "warning": "#a34d14",
+    "info": "#036a96",
+    "highlight": "#cec395",
+    "divider": "#ceccc0",
+    "overlay": "rgba(31, 31, 31, 0.35)",
+    "accent-soft": "#ddd4e4",
+    "danger-soft": "#f4d1c1",
+    "success-soft": "#cbddba",
+    "warning-soft": "#ebd5bc",
+    "info-soft": "#c8dbd8"
+  },
+  "text": {
+    "text": "#1f1f1f",
+    "strong": "#1f1f1f",
+    "muted": "#6c664b",
+    "faint": "#6c664b",
+    "link": "#036a96",
+    "on-accent": "#1f1f1f",
+    "accent": "#644ac9",
+    "danger": "#cb3a2a",
+    "success": "#14710a",
+    "warning": "#a34d14",
+    "info": "#036a96"
+  },
+  "border": {
+    "subtle": "#ceccc0",
+    "strong": "#6c664b",
+    "accent": "#644ac9",
+    "danger": "#cb3a2a",
+    "success": "#14710a",
+    "warning": "#a34d14",
+    "info": "#036a96"
+  },
+  "textOnFill": {
+    "accent": "#fffbeb",
+    "danger": "#fffbeb",
+    "success": "#fffbeb",
+    "warning": "#fffbeb",
+    "info": "#fffbeb"
+  },
+  "interface": {
+    "visitedLink": "#a3144d",
+    "selection": "#cfcfde",
+    "selectionText": "#1f1f1f",
+    "scrollbarThumb": "#bcbab3",
+    "scrollbarTrack": "#fffbeb"
+  }
+}

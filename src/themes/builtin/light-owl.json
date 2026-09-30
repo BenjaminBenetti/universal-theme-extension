@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "light-owl",
+  "name": "Light Owl",
+  "family": "Night Owl",
+  "mode": "light",
+  "background": {
+    "page": "#fbfbfb",
+    "surface": "#f0f0f0",
+    "raised": "#f0f0f0",
+    "input": "#f0f0f0",
+    "control": "#e0e7ea",
+    "selected": "#d3e8f8",
+    "code": "#f6f6f6",
+    "accent": "#2aa298",
+    "danger": "#e64d49",
+    "success": "#08916a",
+    "warning": "#daaa01",
+    "info": "#288ed7",
+    "highlight": "#cfd5d5",
+    "divider": "#d9d9d9",
+    "overlay": "rgba(64, 63, 83, 0.35)",
+    "accent-soft": "#cde7e5",
+    "danger-soft": "#f6d5d4",
+    "success-soft": "#c6e4db",
+    "warning-soft": "#f4e9c4",
+    "info-soft": "#cde3f3"
+  },
+  "text": {
+    "text": "#403f53",
+    "strong": "#111111",
+    "muted": "#5f7e97",
+    "faint": "#93a1a1",
+    "link": "#4876d6",
+    "on-accent": "#111111",
+    "accent": "#2aa298",
+    "danger": "#e64d49",
+    "success": "#08916a",
+    "warning": "#b48500",
+    "info": "#288ed7"
+  },
+  "border": {
+    "subtle": "#d9d9d9",
+    "strong": "#93a1a1",
+    "accent": "#2aa298",
+    "danger": "#e64d49",
+    "success": "#08916a",
+    "warning": "#daaa01",
+    "info": "#288ed7"
+  },
+  "textOnFill": {
+    "accent": "#111111",
+    "danger": "#111111",
+    "success": "#111111",
+    "warning": "#111111",
+    "info": "#111111"
+  },
+  "interface": {
+    "visitedLink": "#994cc3",
+    "selection": "#e0e0e0",
+    "selectionText": "#403f53",
+    "scrollbarThumb": "#93a1a1",
+    "scrollbarTrack": "#fbfbfb"
+  }
+}

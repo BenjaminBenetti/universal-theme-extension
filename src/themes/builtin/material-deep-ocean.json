@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "material-deep-ocean",
+  "name": "Material Deep Ocean",
+  "family": "Material",
+  "mode": "dark",
+  "background": {
+    "page": "#0f111a",
+    "surface": "#090b10",
+    "raised": "#181a1f",
+    "input": "#1a1c25",
+    "control": "#1f2233",
+    "selected": "#404767",
+    "code": "#191a21",
+    "accent": "#84ffff",
+    "danger": "#ff5370",
+    "success": "#c3e88d",
+    "warning": "#ffcb6b",
+    "info": "#82aaff",
+    "highlight": "#635211",
+    "divider": "#232637",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#264148",
+    "danger-soft": "#3f1e2b",
+    "success-soft": "#333c31",
+    "warning-soft": "#3f362a",
+    "info-soft": "#263048"
+  },
+  "text": {
+    "text": "#eeffff",
+    "strong": "#ffffff",
+    "muted": "#8f93a2",
+    "faint": "#4b526d",
+    "link": "#80cbc4",
+    "on-accent": "#ffffff",
+    "accent": "#84ffff",
+    "danger": "#ff5370",
+    "success": "#c3e88d",
+    "warning": "#ffcb6b",
+    "info": "#82aaff"
+  },
+  "border": {
+    "subtle": "#232637",
+    "strong": "#4b526d",
+    "accent": "#84ffff",
+    "danger": "#ff5370",
+    "success": "#c3e88d",
+    "warning": "#ffcb6b",
+    "info": "#82aaff"
+  },
+  "textOnFill": {
+    "accent": "#0f111a",
+    "danger": "#0f111a",
+    "success": "#0f111a",
+    "warning": "#0f111a",
+    "info": "#0f111a"
+  },
+  "interface": {
+    "visitedLink": "#c792ea",
+    "selection": "#404767",
+    "selectionText": "#ffffff",
+    "scrollbarThumb": "#464b5d",
+    "scrollbarTrack": "#0f111a"
+  }
+}

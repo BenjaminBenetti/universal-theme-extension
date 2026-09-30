@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "horizon-light",
+  "name": "Horizon Bright",
+  "family": "Horizon",
+  "mode": "light",
+  "background": {
+    "page": "#fdf0ed",
+    "surface": "#fadad1",
+    "raised": "#fadad1",
+    "input": "#f9cbbe",
+    "control": "#f9cbbe",
+    "selected": "#e5c1b1",
+    "code": "#fadad1",
+    "accent": "#e84a72",
+    "danger": "#f43e5c",
+    "success": "#07da8c",
+    "warning": "#f6661e",
+    "info": "#26bbd9",
+    "highlight": "#f9ab85",
+    "divider": "#e6dad8",
+    "overlay": "rgba(6, 6, 12, 0.35)",
+    "accent-soft": "#f8cbd2",
+    "danger-soft": "#fbc9cd",
+    "success-soft": "#c7ebd8",
+    "warning-soft": "#fbd2bf",
+    "info-soft": "#cee4e9"
+  },
+  "text": {
+    "text": "#1e1d22",
+    "strong": "#06060c",
+    "muted": "#504c4f",
+    "faint": "#b2a9a9",
+    "link": "#e84a72",
+    "on-accent": "#06060c",
+    "accent": "#e84a72",
+    "danger": "#da103f",
+    "success": "#009963",
+    "warning": "#af5427",
+    "info": "#1d8991"
+  },
+  "border": {
+    "subtle": "#e6dad8",
+    "strong": "#b2a9a9",
+    "accent": "#e84a72",
+    "danger": "#da103f",
+    "success": "#009963",
+    "warning": "#af5427",
+    "info": "#1d8991"
+  },
+  "textOnFill": {
+    "accent": "#06060c",
+    "danger": "#06060c",
+    "success": "#06060c",
+    "warning": "#06060c",
+    "info": "#06060c"
+  },
+  "interface": {
+    "visitedLink": "#8a31b9",
+    "selection": "#d6a28a",
+    "selectionText": "#06060c",
+    "scrollbarThumb": "#f9cec3",
+    "scrollbarTrack": "#fdf0ed"
+  }
+}

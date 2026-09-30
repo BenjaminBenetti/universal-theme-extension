@@ -27,6 +27,8 @@ export const SETTINGS_KEY = 'settings';
 /** Themes made in the editor, by id. Kept apart from settings so settings stay small. */
 export const CUSTOM_THEMES_KEY = 'customThemes';
 export const cacheKey = (host: string) => `labels:${host}`;
+/** A built-in theme's compiled variables (themeVarsCss), cached by the background. */
+export const themeCssKey = (id: string) => `themeCss:${id}`;
 
 /** One cached Jev decision: labels plus when Jev made it. */
 export interface CacheEntry {

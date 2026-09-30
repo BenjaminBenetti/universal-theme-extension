@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "rose-pine",
+  "name": "Rosé Pine",
+  "family": "Rosé Pine",
+  "mode": "dark",
+  "background": {
+    "page": "#191724",
+    "surface": "#1f1d2e",
+    "raised": "#26233a",
+    "input": "#1f1d2e",
+    "control": "#403d52",
+    "selected": "#524f67",
+    "code": "#1f1d2e",
+    "accent": "#ebbcba",
+    "danger": "#eb6f92",
+    "success": "#31748f",
+    "warning": "#f6c177",
+    "info": "#9ccfd8",
+    "highlight": "#453935",
+    "divider": "#524f67",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#433842",
+    "danger-soft": "#43293a",
+    "success-soft": "#1e2a39",
+    "warning-soft": "#453935",
+    "info-soft": "#333c48"
+  },
+  "text": {
+    "text": "#e0def4",
+    "strong": "#e0def4",
+    "muted": "#908caa",
+    "faint": "#6e6a86",
+    "link": "#c4a7e7",
+    "on-accent": "#e0def4",
+    "accent": "#ebbcba",
+    "danger": "#eb6f92",
+    "success": "#31748f",
+    "warning": "#f6c177",
+    "info": "#9ccfd8"
+  },
+  "border": {
+    "subtle": "#524f67",
+    "strong": "#6e6a86",
+    "accent": "#ebbcba",
+    "danger": "#eb6f92",
+    "success": "#31748f",
+    "warning": "#f6c177",
+    "info": "#9ccfd8"
+  },
+  "textOnFill": {
+    "accent": "#191724",
+    "danger": "#191724",
+    "success": "#e0def4",
+    "warning": "#191724",
+    "info": "#191724"
+  },
+  "interface": {
+    "visitedLink": "#ebbcba",
+    "selection": "#403d52",
+    "selectionText": "#e0def4",
+    "scrollbarThumb": "#6e6a86",
+    "scrollbarTrack": "#191724"
+  }
+}

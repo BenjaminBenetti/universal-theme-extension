@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "catppuccin-frappe",
+  "name": "Catppuccin Frappé",
+  "family": "Catppuccin",
+  "mode": "dark",
+  "background": {
+    "page": "#303446",
+    "surface": "#292c3c",
+    "raised": "#414559",
+    "input": "#414559",
+    "control": "#51576d",
+    "selected": "#626880",
+    "code": "#292c3c",
+    "accent": "#ca9ee6",
+    "danger": "#e78284",
+    "success": "#a6d189",
+    "warning": "#e5c890",
+    "info": "#8caaee",
+    "highlight": "#506373",
+    "divider": "#51576d",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#4f4966",
+    "danger-soft": "#554452",
+    "success-soft": "#485353",
+    "warning-soft": "#545255",
+    "info-soft": "#424c68"
+  },
+  "text": {
+    "text": "#c6d0f5",
+    "strong": "#c6d0f5",
+    "muted": "#a5adce",
+    "faint": "#838ba7",
+    "link": "#8caaee",
+    "on-accent": "#303446",
+    "accent": "#ca9ee6",
+    "danger": "#e78284",
+    "success": "#a6d189",
+    "warning": "#e5c890",
+    "info": "#8caaee"
+  },
+  "border": {
+    "subtle": "#51576d",
+    "strong": "#737994",
+    "accent": "#ca9ee6",
+    "danger": "#e78284",
+    "success": "#a6d189",
+    "warning": "#e5c890",
+    "info": "#8caaee"
+  },
+  "textOnFill": {
+    "accent": "#303446",
+    "danger": "#303446",
+    "success": "#303446",
+    "warning": "#303446",
+    "info": "#303446"
+  },
+  "interface": {
+    "visitedLink": "#ca9ee6",
+    "selection": "#626880",
+    "selectionText": "#c6d0f5",
+    "scrollbarThumb": "#626880",
+    "scrollbarTrack": "#303446"
+  }
+}

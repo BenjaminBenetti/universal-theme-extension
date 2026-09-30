@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "nordfox",
+  "name": "Nordfox",
+  "family": "Nightfox",
+  "mode": "dark",
+  "background": {
+    "page": "#2e3440",
+    "surface": "#232831",
+    "raised": "#39404f",
+    "input": "#39404f",
+    "control": "#444c5e",
+    "selected": "#4f6074",
+    "code": "#232831",
+    "accent": "#81a1c1",
+    "danger": "#bf616a",
+    "success": "#a3be8c",
+    "warning": "#ebcb8b",
+    "info": "#81a1c1",
+    "highlight": "#4f6074",
+    "divider": "#5a657d",
+    "overlay": "rgba(35, 40, 49, 0.6)",
+    "accent-soft": "#3f4a5a",
+    "danger-soft": "#4b3d48",
+    "success-soft": "#45504f",
+    "warning-soft": "#54524f",
+    "info-soft": "#3f4a5a"
+  },
+  "text": {
+    "text": "#cdcecf",
+    "strong": "#e5e9f0",
+    "muted": "#abb1bb",
+    "faint": "#7e8188",
+    "link": "#81a1c1",
+    "on-accent": "#e5e9f0",
+    "accent": "#81a1c1",
+    "danger": "#bf616a",
+    "success": "#a3be8c",
+    "warning": "#ebcb8b",
+    "info": "#81a1c1"
+  },
+  "border": {
+    "subtle": "#5a657d",
+    "strong": "#7e8188",
+    "accent": "#81a1c1",
+    "danger": "#bf616a",
+    "success": "#a3be8c",
+    "warning": "#ebcb8b",
+    "info": "#81a1c1"
+  },
+  "textOnFill": {
+    "accent": "#2e3440",
+    "danger": "#e5e9f0",
+    "success": "#2e3440",
+    "warning": "#2e3440",
+    "info": "#2e3440"
+  },
+  "interface": {
+    "visitedLink": "#b48ead",
+    "selection": "#3e4a5b",
+    "selectionText": "#cdcecf",
+    "scrollbarThumb": "#4f6074",
+    "scrollbarTrack": "#2e3440"
+  }
+}

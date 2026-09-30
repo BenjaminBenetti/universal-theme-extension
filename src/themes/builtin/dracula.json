@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "dracula",
+  "name": "Dracula",
+  "family": "Dracula",
+  "mode": "dark",
+  "background": {
+    "page": "#282a36",
+    "surface": "#21222c",
+    "raised": "#343746",
+    "input": "#21222c",
+    "control": "#424450",
+    "selected": "#44475a",
+    "code": "#21222c",
+    "accent": "#bd93f9",
+    "danger": "#ff5555",
+    "success": "#50fa7b",
+    "warning": "#ffb86c",
+    "info": "#8be9fd",
+    "highlight": "#787d58",
+    "divider": "#44475a",
+    "overlay": "rgba(25, 26, 33, 0.6)",
+    "accent-soft": "#463f5d",
+    "danger-soft": "#53333c",
+    "success-soft": "#305444",
+    "warning-soft": "#534641",
+    "info-soft": "#3c505e"
+  },
+  "text": {
+    "text": "#f8f8f2",
+    "strong": "#ffffff",
+    "muted": "#6272a4",
+    "faint": "#6272a4",
+    "link": "#8be9fd",
+    "on-accent": "#ffffff",
+    "accent": "#bd93f9",
+    "danger": "#ff5555",
+    "success": "#50fa7b",
+    "warning": "#ffb86c",
+    "info": "#8be9fd"
+  },
+  "border": {
+    "subtle": "#44475a",
+    "strong": "#6272a4",
+    "accent": "#bd93f9",
+    "danger": "#ff5555",
+    "success": "#50fa7b",
+    "warning": "#ffb86c",
+    "info": "#8be9fd"
+  },
+  "textOnFill": {
+    "accent": "#282a36",
+    "danger": "#282a36",
+    "success": "#282a36",
+    "warning": "#282a36",
+    "info": "#282a36"
+  },
+  "interface": {
+    "visitedLink": "#ff79c6",
+    "selection": "#44475a",
+    "selectionText": "#f8f8f2",
+    "scrollbarThumb": "#44475a",
+    "scrollbarTrack": "#282a36"
+  }
+}

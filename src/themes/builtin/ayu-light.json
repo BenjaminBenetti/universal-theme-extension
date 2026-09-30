@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "ayu-light",
+  "name": "Ayu Light",
+  "family": "Ayu",
+  "mode": "light",
+  "background": {
+    "page": "#fcfcfc",
+    "surface": "#ebeef0",
+    "raised": "#ffffff",
+    "input": "#ffffff",
+    "control": "#e4e6e9",
+    "selected": "#d7e4f6",
+    "code": "#f0f1f3",
+    "accent": "#f29718",
+    "danger": "#e65050",
+    "success": "#719700",
+    "warning": "#cf6610",
+    "info": "#4393ae",
+    "highlight": "#ffe294",
+    "divider": "#e4e6e9",
+    "overlay": "rgba(92, 97, 102, 0.35)",
+    "accent-soft": "#fae6ca",
+    "danger-soft": "#f7d6d6",
+    "success-soft": "#dde6c5",
+    "warning-soft": "#f2dbc8",
+    "info-soft": "#d3e5eb"
+  },
+  "text": {
+    "text": "#5c6166",
+    "strong": "#5c6166",
+    "muted": "#828e9f",
+    "faint": "#adaeb1",
+    "link": "#1a91cd",
+    "on-accent": "#5c6166",
+    "accent": "#b37c00",
+    "danger": "#e65050",
+    "success": "#719700",
+    "warning": "#cf6610",
+    "info": "#4393ae"
+  },
+  "border": {
+    "subtle": "#e4e6e9",
+    "strong": "#adaeb1",
+    "accent": "#f29718",
+    "danger": "#e65050",
+    "success": "#86b300",
+    "warning": "#fa8532",
+    "info": "#55b4d4"
+  },
+  "textOnFill": {
+    "accent": "#7e4b01",
+    "danger": "#fcfcfc",
+    "success": "#fcfcfc",
+    "warning": "#fcfcfc",
+    "info": "#fcfcfc"
+  },
+  "interface": {
+    "visitedLink": "#a37acc",
+    "selection": "#d7e4f6",
+    "selectionText": "#5c6166",
+    "scrollbarThumb": "#cbd0d7",
+    "scrollbarTrack": "#fcfcfc"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "tokyo-night",
+  "name": "Tokyo Night",
+  "family": "Tokyo Night",
+  "mode": "dark",
+  "background": {
+    "page": "#1a1b26",
+    "surface": "#16161e",
+    "raised": "#292e42",
+    "input": "#292e42",
+    "control": "#3b4261",
+    "selected": "#283457",
+    "code": "#16161e",
+    "accent": "#7aa2f7",
+    "danger": "#f7768e",
+    "success": "#9ece6a",
+    "warning": "#e0af68",
+    "info": "#0db9d7",
+    "highlight": "#3d59a1",
+    "divider": "#3b4261",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#2d3650",
+    "danger-soft": "#462d3b",
+    "success-soft": "#343f34",
+    "warning-soft": "#423933",
+    "info-soft": "#173b49"
+  },
+  "text": {
+    "text": "#c0caf5",
+    "strong": "#c0caf5",
+    "muted": "#a9b1d6",
+    "faint": "#565f89",
+    "link": "#7aa2f7",
+    "on-accent": "#c0caf5",
+    "accent": "#7aa2f7",
+    "danger": "#f7768e",
+    "success": "#9ece6a",
+    "warning": "#e0af68",
+    "info": "#0db9d7"
+  },
+  "border": {
+    "subtle": "#3b4261",
+    "strong": "#545c7e",
+    "accent": "#7aa2f7",
+    "danger": "#f7768e",
+    "success": "#9ece6a",
+    "warning": "#e0af68",
+    "info": "#0db9d7"
+  },
+  "textOnFill": {
+    "accent": "#1a1b26",
+    "danger": "#1a1b26",
+    "success": "#1a1b26",
+    "warning": "#1a1b26",
+    "info": "#1a1b26"
+  },
+  "interface": {
+    "visitedLink": "#bb9af7",
+    "selection": "#283457",
+    "selectionText": "#c0caf5",
+    "scrollbarThumb": "#3b4261",
+    "scrollbarTrack": "#1a1b26"
+  }
+}

@@ -47,8 +47,10 @@ test.describe('type-ahead theme picker', () => {
 
     await input.click();
     await input.fill('light hard');
+    await expect(page.locator('.picker-option')).toHaveText(['Gruvbox Light Hard', 'Everforest Light Hard']);
+    await input.fill('gruv light hard');
     await expect(page.locator('.picker-option')).toHaveText(['Gruvbox Light Hard']);
-    await expect(page.locator('.picker-option mark')).toHaveText(['Light', 'Hard']);
+    await expect(page.locator('.picker-option mark')).toHaveText(['Gruv', 'Light', 'Hard']);
     await input.press('Enter');
     await expect(input).toHaveValue('Gruvbox Light Hard');
     await expect.poll(async () => ((await ext.storage()).settings as { defaultTheme: string }).defaultTheme).toBe('gruvbox-light-hard');
@@ -64,6 +66,8 @@ test.describe('type-ahead theme picker', () => {
 
     await input.click();
     await input.fill('solarized');
+    await expect(page.locator('.picker-option')).toHaveText(['Solarized Dark', 'Solarized Light']);
+    await input.fill('vaporwave');
     await expect(page.locator('.picker-empty')).toHaveText('No themes match');
   });
 });

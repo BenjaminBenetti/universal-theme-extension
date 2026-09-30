@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "terafox",
+  "name": "Terafox",
+  "family": "Nightfox",
+  "mode": "dark",
+  "background": {
+    "page": "#152528",
+    "surface": "#0f1c1e",
+    "raised": "#1d3337",
+    "input": "#1d3337",
+    "control": "#254147",
+    "selected": "#425e5e",
+    "code": "#0f1c1e",
+    "accent": "#5a93aa",
+    "danger": "#e85c51",
+    "success": "#7aa4a1",
+    "warning": "#fda47f",
+    "info": "#5a93aa",
+    "highlight": "#425e5e",
+    "divider": "#2d4f56",
+    "overlay": "rgba(15, 28, 30, 0.6)",
+    "accent-soft": "#233b42",
+    "danger-soft": "#3f3030",
+    "success-soft": "#293e40",
+    "warning-soft": "#433e39",
+    "info-soft": "#233b42"
+  },
+  "text": {
+    "text": "#e6eaea",
+    "strong": "#eaeeee",
+    "muted": "#cbd9d8",
+    "faint": "#587b7b",
+    "link": "#5a93aa",
+    "on-accent": "#eaeeee",
+    "accent": "#5a93aa",
+    "danger": "#e85c51",
+    "success": "#7aa4a1",
+    "warning": "#fda47f",
+    "info": "#5a93aa"
+  },
+  "border": {
+    "subtle": "#2d4f56",
+    "strong": "#587b7b",
+    "accent": "#5a93aa",
+    "danger": "#e85c51",
+    "success": "#7aa4a1",
+    "warning": "#fda47f",
+    "info": "#5a93aa"
+  },
+  "textOnFill": {
+    "accent": "#152528",
+    "danger": "#152528",
+    "success": "#152528",
+    "warning": "#152528",
+    "info": "#152528"
+  },
+  "interface": {
+    "visitedLink": "#ad5c7c",
+    "selection": "#293e40",
+    "selectionText": "#e6eaea",
+    "scrollbarThumb": "#425e5e",
+    "scrollbarTrack": "#152528"
+  }
+}

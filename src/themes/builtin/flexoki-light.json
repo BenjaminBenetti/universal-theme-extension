@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "flexoki-light",
+  "name": "Flexoki Light",
+  "family": "Flexoki",
+  "mode": "light",
+  "background": {
+    "page": "#fffcf0",
+    "surface": "#f2f0e5",
+    "raised": "#e6e4d9",
+    "input": "#f2f0e5",
+    "control": "#dad8ce",
+    "selected": "#cecdc3",
+    "code": "#f2f0e5",
+    "accent": "#24837b",
+    "danger": "#af3029",
+    "success": "#66800b",
+    "warning": "#bc5215",
+    "info": "#205ea6",
+    "highlight": "#d0a215",
+    "divider": "#e6e4d9",
+    "overlay": "rgba(16, 15, 15, 0.35)",
+    "accent-soft": "#cfe1d6",
+    "danger-soft": "#edcfc4",
+    "success-soft": "#dde1be",
+    "warning-soft": "#f0d7c0",
+    "info-soft": "#ced9e0"
+  },
+  "text": {
+    "text": "#100f0f",
+    "strong": "#100f0f",
+    "muted": "#6f6e69",
+    "faint": "#b7b5ac",
+    "link": "#24837b",
+    "on-accent": "#100f0f",
+    "accent": "#24837b",
+    "danger": "#af3029",
+    "success": "#66800b",
+    "warning": "#bc5215",
+    "info": "#205ea6"
+  },
+  "border": {
+    "subtle": "#e6e4d9",
+    "strong": "#cecdc3",
+    "accent": "#24837b",
+    "danger": "#af3029",
+    "success": "#66800b",
+    "warning": "#bc5215",
+    "info": "#205ea6"
+  },
+  "textOnFill": {
+    "accent": "#fffcf0",
+    "danger": "#fffcf0",
+    "success": "#fffcf0",
+    "warning": "#fffcf0",
+    "info": "#fffcf0"
+  },
+  "interface": {
+    "visitedLink": "#5e409d",
+    "selection": "#bfbdb4",
+    "selectionText": "#100f0f",
+    "scrollbarThumb": "#cecdc3",
+    "scrollbarTrack": "#fffcf0"
+  }
+}

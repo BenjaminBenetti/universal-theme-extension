@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "poimandres",
+  "name": "Poimandres",
+  "family": "Poimandres",
+  "mode": "dark",
+  "background": {
+    "page": "#1b1e28",
+    "surface": "#202430",
+    "raised": "#262934",
+    "input": "#262934",
+    "control": "#303340",
+    "selected": "#383b4d",
+    "code": "#13151b",
+    "accent": "#5de4c7",
+    "danger": "#d0679d",
+    "success": "#5fb3a1",
+    "warning": "#fffac2",
+    "info": "#89ddff",
+    "highlight": "#404c5e",
+    "divider": "#303340",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#284648",
+    "danger-soft": "#3f2d3f",
+    "success-soft": "#293c40",
+    "warning-soft": "#383a3b",
+    "info-soft": "#314453"
+  },
+  "text": {
+    "text": "#a6accd",
+    "strong": "#e4f0fb",
+    "muted": "#767c9d",
+    "faint": "#506477",
+    "link": "#add7ff",
+    "on-accent": "#e4f0fb",
+    "accent": "#5de4c7",
+    "danger": "#d0679d",
+    "success": "#5fb3a1",
+    "warning": "#fffac2",
+    "info": "#89ddff"
+  },
+  "border": {
+    "subtle": "#303340",
+    "strong": "#506477",
+    "accent": "#5de4c7",
+    "danger": "#d0679d",
+    "success": "#5fb3a1",
+    "warning": "#fffac2",
+    "info": "#89ddff"
+  },
+  "textOnFill": {
+    "accent": "#1b1e28",
+    "danger": "#1b1e28",
+    "success": "#1b1e28",
+    "warning": "#1b1e28",
+    "info": "#1b1e28"
+  },
+  "interface": {
+    "visitedLink": "#f087bd",
+    "selection": "#272c3c",
+    "selectionText": "#e4f0fb",
+    "scrollbarThumb": "#506477",
+    "scrollbarTrack": "#1b1e28"
+  }
+}

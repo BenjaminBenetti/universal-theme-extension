@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "material-palenight",
+  "name": "Material Palenight",
+  "family": "Material",
+  "mode": "dark",
+  "background": {
+    "page": "#292d3e",
+    "surface": "#202331",
+    "raised": "#34324a",
+    "input": "#333747",
+    "control": "#414863",
+    "selected": "#495072",
+    "code": "#303348",
+    "accent": "#ab47bc",
+    "danger": "#ff5370",
+    "success": "#c3e88d",
+    "warning": "#ffcb6b",
+    "info": "#82aaff",
+    "highlight": "#746528",
+    "divider": "#364367",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#433257",
+    "danger-soft": "#543548",
+    "success-soft": "#48524e",
+    "warning-soft": "#544d47",
+    "info-soft": "#3b4665"
+  },
+  "text": {
+    "text": "#eeffff",
+    "strong": "#ffffff",
+    "muted": "#a6accd",
+    "faint": "#676e95",
+    "link": "#80cbc4",
+    "on-accent": "#ffffff",
+    "accent": "#c792ea",
+    "danger": "#ff5370",
+    "success": "#c3e88d",
+    "warning": "#ffcb6b",
+    "info": "#82aaff"
+  },
+  "border": {
+    "subtle": "#364367",
+    "strong": "#676e95",
+    "accent": "#c792ea",
+    "danger": "#ff5370",
+    "success": "#c3e88d",
+    "warning": "#ffcb6b",
+    "info": "#82aaff"
+  },
+  "textOnFill": {
+    "accent": "#ffffff",
+    "danger": "#292d3e",
+    "success": "#292d3e",
+    "warning": "#292d3e",
+    "info": "#292d3e"
+  },
+  "interface": {
+    "visitedLink": "#c792ea",
+    "selection": "#495072",
+    "selectionText": "#ffffff",
+    "scrollbarThumb": "#515772",
+    "scrollbarTrack": "#292d3e"
+  }
+}

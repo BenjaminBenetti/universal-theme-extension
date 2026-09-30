@@ -54,12 +54,12 @@ describe('first-paint stylesheet registration', () => {
 
   it('gives a custom theme the first-paint stylesheet of the nearest built-in', () => {
     const custom = navy();
-    expect(bootFileFor(custom['custom-navy']!.definition)).toBe('boot/gruvbox-dark-hard.css');
+    expect(bootFileFor(custom['custom-navy']!.definition)).toBe('boot/nightfox.css'); // #192330 is closest to #101830
     const light = { ...custom['custom-navy']!.definition, id: 'custom-paper', mode: 'light' as const };
     light.background = { ...light.background, page: '#ffffff' };
-    expect(bootFileFor(light)).toBe('boot/gruvbox-light-hard.css');
+    expect(bootFileFor(light)).toBe('boot/github-light-high-contrast.css'); // pure white
     const scripts = bootScripts(settings({ defaultTheme: 'custom-navy' }), custom);
-    expect(scripts).toEqual([expect.objectContaining({ id: 'boot-default', css: ['boot/gruvbox-dark-hard.css'] })]);
+    expect(scripts).toEqual([expect.objectContaining({ id: 'boot-default', css: ['boot/nightfox.css'] })]);
   });
 
   it('registers nothing when theming is off or there is no key', () => {

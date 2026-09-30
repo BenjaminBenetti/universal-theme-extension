@@ -18,6 +18,7 @@ import {
 } from '../themes/format.ts';
 import { DEFAULT_THEME_ID, findTheme, isBuiltin, type CustomThemes } from '../themes/index.ts';
 import { themeOptions } from './common.ts';
+import { dockInky } from './inky.ts';
 import { ThemePicker } from './theme-picker.ts';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -432,6 +433,7 @@ function loadImport() {
 }
 
 async function main() {
+  dockInky($('inky-dock'), 2);
   custom = await loadCustomThemes();
   const settings = await loadSettings();
   const params = new URLSearchParams(location.search);

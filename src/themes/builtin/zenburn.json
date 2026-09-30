@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "zenburn",
+  "name": "Zenburn",
+  "family": "Zenburn",
+  "mode": "dark",
+  "background": {
+    "page": "#3f3f3f",
+    "surface": "#333333",
+    "raised": "#2c2e2e",
+    "input": "#2c2e2e",
+    "control": "#4f4f4f",
+    "selected": "#304a3d",
+    "code": "#484848",
+    "accent": "#f0dfaf",
+    "danger": "#e37170",
+    "success": "#9ece9e",
+    "warning": "#dfaf8f",
+    "info": "#8cd0d3",
+    "highlight": "#284f28",
+    "divider": "#688060",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#625f55",
+    "danger-soft": "#604949",
+    "success-soft": "#525c52",
+    "warning-soft": "#5f554f",
+    "info-soft": "#4e5c5d"
+  },
+  "text": {
+    "text": "#dcdccc",
+    "strong": "#efefef",
+    "muted": "#9fafaf",
+    "faint": "#8f8f8f",
+    "link": "#8cb0d3",
+    "on-accent": "#efefef",
+    "accent": "#f0dfaf",
+    "danger": "#e37170",
+    "success": "#9ece9e",
+    "warning": "#dfaf8f",
+    "info": "#8cd0d3"
+  },
+  "border": {
+    "subtle": "#5b605e",
+    "strong": "#8f8f8f",
+    "accent": "#f0dfaf",
+    "danger": "#e37170",
+    "success": "#9ece9e",
+    "warning": "#dfaf8f",
+    "info": "#8cd0d3"
+  },
+  "textOnFill": {
+    "accent": "#3f3f3f",
+    "danger": "#3f3f3f",
+    "success": "#3f3f3f",
+    "warning": "#3f3f3f",
+    "info": "#3f3f3f"
+  },
+  "interface": {
+    "visitedLink": "#bc8cbc",
+    "selection": "#304a3d",
+    "selectionText": "#dcdccc",
+    "scrollbarThumb": "#6f6f6f",
+    "scrollbarTrack": "#3f3f3f"
+  }
+}

@@ -2,6 +2,7 @@ import { DEFAULT_API_BASE } from '../background/jev.ts';
 import { CUSTOM_THEMES_KEY, deleteCustomTheme, loadCustomThemes, loadSettings, saveSettings, type Settings } from '../shared/settings.ts';
 import { DEFAULT_THEME_ID, findTheme, swatchesOf, type CustomThemes } from '../themes/index.ts';
 import { OFF_OPTION, themeOptions } from './common.ts';
+import { roamInky } from './inky.ts';
 import { renderSwatches, ThemePicker } from './theme-picker.ts';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -91,6 +92,7 @@ function renderSites() {
 }
 
 async function main() {
+  roamInky(document.querySelector('main')!, $('inky-dock'));
   [settings, custom] = await Promise.all([loadSettings(), loadCustomThemes()]);
 
   const keyInput = $<HTMLInputElement>('api-key');

@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "tomorrow-night-eighties",
+  "name": "Tomorrow Night Eighties",
+  "family": "Tomorrow",
+  "mode": "dark",
+  "background": {
+    "page": "#2d2d2d",
+    "surface": "#393939",
+    "raised": "#393939",
+    "input": "#393939",
+    "control": "#515151",
+    "selected": "#6a6a6a",
+    "code": "#333333",
+    "accent": "#ffcc66",
+    "danger": "#f2777a",
+    "success": "#99cc99",
+    "warning": "#f99157",
+    "info": "#66cccc",
+    "highlight": "#776541",
+    "divider": "#515151",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#574d38",
+    "danger-soft": "#543c3c",
+    "success-soft": "#434d43",
+    "warning-soft": "#564135",
+    "info-soft": "#384d4d"
+  },
+  "text": {
+    "text": "#cccccc",
+    "strong": "#cccccc",
+    "muted": "#999999",
+    "faint": "#6e6e6e",
+    "link": "#6699cc",
+    "on-accent": "#cccccc",
+    "accent": "#ffcc66",
+    "danger": "#f2777a",
+    "success": "#99cc99",
+    "warning": "#f99157",
+    "info": "#66cccc"
+  },
+  "border": {
+    "subtle": "#515151",
+    "strong": "#6a6a6a",
+    "accent": "#ffcc66",
+    "danger": "#f2777a",
+    "success": "#99cc99",
+    "warning": "#f99157",
+    "info": "#66cccc"
+  },
+  "textOnFill": {
+    "accent": "#2d2d2d",
+    "danger": "#2d2d2d",
+    "success": "#2d2d2d",
+    "warning": "#2d2d2d",
+    "info": "#2d2d2d"
+  },
+  "interface": {
+    "visitedLink": "#cc99cc",
+    "selection": "#515151",
+    "selectionText": "#cccccc",
+    "scrollbarThumb": "#4d5057",
+    "scrollbarTrack": "#2d2d2d"
+  }
+}

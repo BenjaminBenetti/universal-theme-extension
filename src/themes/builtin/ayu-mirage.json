@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "ayu-mirage",
+  "name": "Ayu Mirage",
+  "family": "Ayu",
+  "mode": "dark",
+  "background": {
+    "page": "#242936",
+    "surface": "#1f2430",
+    "raised": "#282e3b",
+    "input": "#282e3b",
+    "control": "#333947",
+    "selected": "#2b4768",
+    "code": "#1a1f29",
+    "accent": "#ffcc66",
+    "danger": "#ff6666",
+    "success": "#d5ff80",
+    "warning": "#ffa659",
+    "info": "#5ccfe6",
+    "highlight": "#736950",
+    "divider": "#171b24",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#504a40",
+    "danger-soft": "#503540",
+    "success-soft": "#475445",
+    "warning-soft": "#50423d",
+    "info-soft": "#2f4a59"
+  },
+  "text": {
+    "text": "#cccac2",
+    "strong": "#e3e6ea",
+    "muted": "#707a8c",
+    "faint": "#4a5261",
+    "link": "#73d0ff",
+    "on-accent": "#e3e6ea",
+    "accent": "#ffcc66",
+    "danger": "#ff6666",
+    "success": "#d5ff80",
+    "warning": "#ffa659",
+    "info": "#5ccfe6"
+  },
+  "border": {
+    "subtle": "#171b24",
+    "strong": "#4a5261",
+    "accent": "#ffcc66",
+    "danger": "#ff6666",
+    "success": "#d5ff80",
+    "warning": "#ffa659",
+    "info": "#5ccfe6"
+  },
+  "textOnFill": {
+    "accent": "#735923",
+    "danger": "#242936",
+    "success": "#242936",
+    "warning": "#242936",
+    "info": "#242936"
+  },
+  "interface": {
+    "visitedLink": "#dfbfff",
+    "selection": "#2b4768",
+    "selectionText": "#cccac2",
+    "scrollbarThumb": "#424958",
+    "scrollbarTrack": "#242936"
+  }
+}

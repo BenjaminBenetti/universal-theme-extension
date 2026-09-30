@@ -134,6 +134,31 @@ export function derivedColor(theme: ThemeDefinition, group: Group, key: string):
   return undefined;
 }
 
+/**
+ * Legibility every built-in theme must meet: [what, text color, background color, minimum contrast].
+ * WCAG AA for body text (4.5:1); 3:1 for secondary text, status colors, and labels on fills.
+ */
+export function legibilityRules(t: ThemeDefinition): Array<[string, string, string, number]> {
+  return [
+    ['text on page', t.text.text, t.background.page, 4.5],
+    ['strong on page', t.text.strong, t.background.page, 4.5],
+    ['muted on page', t.text.muted, t.background.page, 3],
+    ['link on page', t.text.link, t.background.page, 3],
+    ['text on surface', t.text.text, t.background.surface, 4.5],
+    ['text on raised', t.text.text, t.background.raised, 4.5],
+    ['text on input', t.text.text, t.background.input, 4.5],
+    ['text on control', t.text.text, t.background.control, 4.5],
+    ['text on selected', t.text.text, t.background.selected, 3],
+    ['text on highlight', t.text.text, t.background.highlight, 3],
+    ['selection text', t.interface.selectionText, t.interface.selection, 3],
+    ...SOLID_BG.flatMap((k): Array<[string, string, string, number]> => [
+      [`on ${k} fill`, t.textOnFill[k], t.background[k], 3],
+      [`${k} text on page`, t.text[k], t.background.page, 3],
+      [`text on ${k}-soft`, t.text.text, t.background[`${k}-soft`], 4.5],
+    ]),
+  ];
+}
+
 /** JSON Schema for theme files (src/themes/theme.schema.json is generated from this). */
 export function themeJsonSchema(): object {
   const groupSchema = (group: Group) => ({

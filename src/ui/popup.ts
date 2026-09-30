@@ -2,11 +2,13 @@ import type { TabStatus } from '../shared/messages.ts';
 import { cacheKey, CUSTOM_THEMES_KEY, loadCustomThemes, loadSettings, saveSettings } from '../shared/settings.ts';
 import { findTheme, swatchesOf } from '../themes/index.ts';
 import { OFF_OPTION, themeOptions } from './common.ts';
+import { dockInky } from './inky.ts';
 import { ThemePicker } from './theme-picker.ts';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
 async function main() {
+  dockInky($('inky-dock'), 2);
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const url = tab?.url ? new URL(tab.url) : undefined;
   const host = url && /^https?:|^file:/.test(url.protocol) ? url.hostname || url.protocol.replace(':', '') : undefined;

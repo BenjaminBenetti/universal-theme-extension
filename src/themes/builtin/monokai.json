@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "monokai",
+  "name": "Monokai",
+  "family": "Monokai",
+  "mode": "dark",
+  "background": {
+    "page": "#272822",
+    "surface": "#1e1f1c",
+    "raised": "#3e3d32",
+    "input": "#414339",
+    "control": "#49483e",
+    "selected": "#75715e",
+    "code": "#34352f",
+    "accent": "#e6db74",
+    "danger": "#f92672",
+    "success": "#a6e22e",
+    "warning": "#fd971f",
+    "info": "#66d9ef",
+    "highlight": "#6a673f",
+    "divider": "#414339",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#4d4c32",
+    "danger-soft": "#512832",
+    "success-soft": "#404d24",
+    "warning-soft": "#523e21",
+    "info-soft": "#344b4b"
+  },
+  "text": {
+    "text": "#f8f8f2",
+    "strong": "#f8f8f2",
+    "muted": "#90908a",
+    "faint": "#75715e",
+    "link": "#66d9ef",
+    "on-accent": "#f8f8f2",
+    "accent": "#e6db74",
+    "danger": "#f92672",
+    "success": "#a6e22e",
+    "warning": "#fd971f",
+    "info": "#66d9ef"
+  },
+  "border": {
+    "subtle": "#414339",
+    "strong": "#75715e",
+    "accent": "#e6db74",
+    "danger": "#f92672",
+    "success": "#a6e22e",
+    "warning": "#fd971f",
+    "info": "#66d9ef"
+  },
+  "textOnFill": {
+    "accent": "#272822",
+    "danger": "#272822",
+    "success": "#272822",
+    "warning": "#272822",
+    "info": "#272822"
+  },
+  "interface": {
+    "visitedLink": "#ae81ff",
+    "selection": "#49483e",
+    "selectionText": "#f8f8f2",
+    "scrollbarThumb": "#75715e",
+    "scrollbarTrack": "#272822"
+  }
+}

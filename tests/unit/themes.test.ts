@@ -1,16 +1,16 @@
 import fs from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { contrastRatio, parseColor } from '../../src/shared/color.ts';
-import { allThemesCss, bootCss, compileTheme } from '../../src/themes/css.ts';
-import { derivedColor, FIELDS, SOLID_BG, themeJsonSchema, validateTheme, type ThemeDefinition } from '../../src/themes/format.ts';
+import { bootCss, compileTheme, sharedStylesheet, themeVarsCss } from '../../src/themes/css.ts';
+import { derivedColor, FIELDS, legibilityRules, themeJsonSchema, validateTheme, type ThemeDefinition } from '../../src/themes/format.ts';
 import { allThemes, BUILTIN_THEMES, DEFAULT_THEME_ID, findTheme } from '../../src/themes/index.ts';
 
 const BUILTIN = BUILTIN_THEMES.map((t) => [t.id, t] as const);
 const copy = (t: ThemeDefinition): ThemeDefinition => structuredClone(t);
 
 describe('built-in themes', () => {
-  it('ships all six Gruvbox variants', () => {
-    expect(BUILTIN_THEMES.map((t) => t.id)).toEqual([
+  it('lists the six Gruvbox variants first', () => {
+    expect(BUILTIN_THEMES.slice(0, 6).map((t) => t.id)).toEqual([
       'gruvbox-dark-hard',
       'gruvbox-dark-medium',
       'gruvbox-dark-soft',
@@ -21,8 +21,19 @@ describe('built-in themes', () => {
     expect(findTheme(DEFAULT_THEME_ID)).toBeDefined();
   });
 
+  it('lists every file in src/themes/builtin (npm run themes -- index)', () => {
+    const dir = new URL('../../src/themes/builtin/', import.meta.url);
+    const files = fs.readdirSync(dir).filter((f) => f.endsWith('.json')).map((f) => f.replace(/\.json$/, ''));
+    expect(BUILTIN_THEMES.map((t) => t.id).sort()).toEqual(files.sort());
+  });
+
+  it('has unique ids and names', () => {
+    expect(new Set(BUILTIN_THEMES.map((t) => t.id)).size).toBe(BUILTIN_THEMES.length);
+    expect(new Set(BUILTIN_THEMES.map((t) => t.name)).size).toBe(BUILTIN_THEMES.length);
+  });
+
   it('uses the canonical Gruvbox bg0 for each contrast', () => {
-    expect(Object.fromEntries(BUILTIN_THEMES.map((t) => [t.id, t.background.page]))).toEqual({
+    expect(Object.fromEntries(BUILTIN_THEMES.filter((t) => t.family === 'Gruvbox').map((t) => [t.id, t.background.page]))).toEqual({
       'gruvbox-dark-hard': '#1d2021',
       'gruvbox-dark-medium': '#282828',
       'gruvbox-dark-soft': '#32302f',
@@ -37,11 +48,16 @@ describe('built-in themes', () => {
   });
 
   it.each(BUILTIN)('%s keeps text legible', (_id, theme) => {
-    const on = (a: string, b: string) => contrastRatio(parseColor(a)!, parseColor(b)!);
-    expect(on(theme.text.text, theme.background.page)).toBeGreaterThan(7);
-    expect(on(theme.text.muted, theme.background.page)).toBeGreaterThan(3);
-    expect(on(theme.text.text, theme.background.raised)).toBeGreaterThan(4.5);
-    for (const solid of SOLID_BG) expect(on(theme.textOnFill[solid], theme.background[solid])).toBeGreaterThan(3);
+    const failures = legibilityRules(theme)
+      .map(([label, fg, bg, min]) => [label, contrastRatio(parseColor(fg)!, parseColor(bg)!), min] as const)
+      .filter(([, ratio, min]) => ratio < min)
+      .map(([label, ratio, min]) => `${label}: ${ratio.toFixed(2)} < ${min}`);
+    expect(failures).toEqual([]);
+  });
+
+  it.each(BUILTIN)('%s says whether it is dark or light correctly', (_id, theme) => {
+    const page = parseColor(theme.background.page)!;
+    expect(contrastRatio(page, parseColor('#000')!) > contrastRatio(page, parseColor('#fff')!)).toBe(theme.mode === 'light');
   });
 });
 
@@ -108,14 +124,20 @@ describe('theme format', () => {
 
 describe('generated CSS', () => {
   const compiled = BUILTIN_THEMES.map(compileTheme);
-  const css = allThemesCss(compiled);
+  const css = sharedStylesheet();
 
-  it('defines every theme as variables and shares one rule set', () => {
-    for (const theme of compiled) {
-      expect(css).toContain(`:root[data-ute-theme="${theme.id}"]`);
-      for (const [name, value] of Object.entries(theme.vars)) expect(css).toContain(`${name}: ${value};`);
-    }
+  it('ships one shared rule set and no theme colors in the page stylesheet', () => {
     expect(css.match(/\[data-ute-bg="raised"\]:not\(\[data-ute-m\]\) \{/g)).toHaveLength(1);
+    expect(css).not.toContain(':root[data-ute-theme="');
+  });
+
+  it("gives each theme a variables block scoped to its id", () => {
+    for (const theme of compiled) {
+      const vars = themeVarsCss(theme);
+      expect(vars).toContain(`:root[data-ute-theme="${theme.id}"]`);
+      for (const [name, value] of Object.entries(theme.vars)) expect(vars).toContain(`${name}: ${value};`);
+      expect(vars).toContain(`color-scheme: ${theme.mode} !important`);
+    }
   });
 
   it('compiles a variable for every color in the format', () => {

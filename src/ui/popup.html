@@ -6,8 +6,10 @@
     <link rel="stylesheet" href="ui.css" />
     <style>
       body { width: 320px; min-height: 420px; padding: 14px; }
-      header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
-      #host { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; }
+      header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+      .brand { display: flex; align-items: center; gap: 8px; }
+      #host { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 110px; }
+      .brand h1 { white-space: nowrap; }
       #status { margin: 4px 0 12px; font-size: 12px; }
       .row { display: flex; gap: 8px; }
       .row button { flex: 1; }
@@ -15,7 +17,7 @@
   </head>
   <body>
     <header>
-      <h1>Universal Theme</h1>
+      <div class="brand"><span id="inky-dock"></span><h1>Universal Theme</h1></div>
       <span id="host" class="muted"></span>
     </header>
     <div id="no-key" class="notice" hidden>

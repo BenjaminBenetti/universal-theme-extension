@@ -15,6 +15,8 @@
       td { padding: 6px 0; border-bottom: 1px solid var(--bg2); }
       td:last-child { text-align: right; }
       #key-status { margin-top: 6px; min-height: 1.4em; }
+      .brand { display: flex; align-items: center; gap: 12px; min-height: 42px; }
+      #inky-dock:empty { display: none; } /* Inky is out roaming the margins */
       .section-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
       .section-head h2 { margin: 0; }
       .actions { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -29,7 +31,7 @@
   <body>
     <main>
       <header>
-        <h1>Universal Theme</h1>
+        <div class="brand"><span id="inky-dock"></span><h1>Universal Theme</h1></div>
         <p class="muted">Jev (TypeSafe AI) decides what every element on a page is. Your theme decides its color.</p>
       </header>
 

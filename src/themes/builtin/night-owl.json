@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "night-owl",
+  "name": "Night Owl",
+  "family": "Night Owl",
+  "mode": "dark",
+  "background": {
+    "page": "#011627",
+    "surface": "#01111d",
+    "raised": "#0b2942",
+    "input": "#0b253a",
+    "control": "#1d3b53",
+    "selected": "#14344f",
+    "code": "#072435",
+    "accent": "#654aa3",
+    "danger": "#ef5350",
+    "success": "#22da6e",
+    "warning": "#b39554",
+    "info": "#7fdbca",
+    "highlight": "#2e475c",
+    "divider": "#122d42",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#152040",
+    "danger-soft": "#31222f",
+    "success-soft": "#083d35",
+    "warning-soft": "#252f30",
+    "info-soft": "#1a3d48"
+  },
+  "text": {
+    "text": "#d6deeb",
+    "strong": "#ffffff",
+    "muted": "#5f7e97",
+    "faint": "#4b6479",
+    "link": "#82aaff",
+    "on-accent": "#ffffff",
+    "accent": "#c792ea",
+    "danger": "#ef5350",
+    "success": "#22da6e",
+    "warning": "#b39554",
+    "info": "#7fdbca"
+  },
+  "border": {
+    "subtle": "#122d42",
+    "strong": "#5f7e97",
+    "accent": "#c792ea",
+    "danger": "#ef5350",
+    "success": "#22da6e",
+    "warning": "#b39554",
+    "info": "#7fdbca"
+  },
+  "textOnFill": {
+    "accent": "#ffffff",
+    "danger": "#011627",
+    "success": "#011627",
+    "warning": "#011627",
+    "info": "#011627"
+  },
+  "interface": {
+    "visitedLink": "#c792ea",
+    "selection": "#1d3b53",
+    "selectionText": "#d6deeb",
+    "scrollbarThumb": "#053254",
+    "scrollbarTrack": "#011627"
+  }
+}

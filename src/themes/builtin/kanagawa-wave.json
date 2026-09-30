@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "kanagawa-wave",
+  "name": "Kanagawa Wave",
+  "family": "Kanagawa",
+  "mode": "dark",
+  "background": {
+    "page": "#1f1f28",
+    "surface": "#16161d",
+    "raised": "#2a2a37",
+    "input": "#2a2a37",
+    "control": "#363646",
+    "selected": "#2d4f67",
+    "code": "#181820",
+    "accent": "#7e9cd8",
+    "danger": "#e82424",
+    "success": "#98bb6c",
+    "warning": "#ff9e3b",
+    "info": "#658594",
+    "highlight": "#49443c",
+    "divider": "#363646",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#32384b",
+    "danger-soft": "#472027",
+    "success-soft": "#373e36",
+    "warning-soft": "#4c382c",
+    "info-soft": "#2d333e"
+  },
+  "text": {
+    "text": "#dcd7ba",
+    "strong": "#dcd7ba",
+    "muted": "#727169",
+    "faint": "#54546d",
+    "link": "#7fb4ca",
+    "on-accent": "#dcd7ba",
+    "accent": "#7e9cd8",
+    "danger": "#e82424",
+    "success": "#98bb6c",
+    "warning": "#ff9e3b",
+    "info": "#658594"
+  },
+  "border": {
+    "subtle": "#363646",
+    "strong": "#54546d",
+    "accent": "#7e9cd8",
+    "danger": "#e82424",
+    "success": "#98bb6c",
+    "warning": "#ff9e3b",
+    "info": "#658594"
+  },
+  "textOnFill": {
+    "accent": "#1f1f28",
+    "danger": "#1f1f28",
+    "success": "#1f1f28",
+    "warning": "#1f1f28",
+    "info": "#1f1f28"
+  },
+  "interface": {
+    "visitedLink": "#957fb8",
+    "selection": "#223249",
+    "selectionText": "#dcd7ba",
+    "scrollbarThumb": "#54546d",
+    "scrollbarTrack": "#1f1f28"
+  }
+}

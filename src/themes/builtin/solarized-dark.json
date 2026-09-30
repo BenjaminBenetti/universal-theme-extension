@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "solarized-dark",
+  "name": "Solarized Dark",
+  "family": "Solarized",
+  "mode": "dark",
+  "background": {
+    "page": "#002b36",
+    "surface": "#073642",
+    "raised": "#073642",
+    "input": "#073642",
+    "control": "#073642",
+    "selected": "#30525c",
+    "code": "#073642",
+    "accent": "#268bd2",
+    "danger": "#dc322f",
+    "success": "#859900",
+    "warning": "#b58900",
+    "info": "#2aa198",
+    "highlight": "#485120",
+    "divider": "#586e75",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#05384c",
+    "danger-soft": "#1f2c35",
+    "success-soft": "#133a2e",
+    "warning-soft": "#19382e",
+    "info-soft": "#063c44"
+  },
+  "text": {
+    "text": "#93a1a1",
+    "strong": "#eee8d5",
+    "muted": "#657b83",
+    "faint": "#586e75",
+    "link": "#268bd2",
+    "on-accent": "#eee8d5",
+    "accent": "#268bd2",
+    "danger": "#dc322f",
+    "success": "#859900",
+    "warning": "#b58900",
+    "info": "#2aa198"
+  },
+  "border": {
+    "subtle": "#586e75",
+    "strong": "#657b83",
+    "accent": "#268bd2",
+    "danger": "#dc322f",
+    "success": "#859900",
+    "warning": "#b58900",
+    "info": "#2aa198"
+  },
+  "textOnFill": {
+    "accent": "#002b36",
+    "danger": "#eee8d5",
+    "success": "#002b36",
+    "warning": "#002b36",
+    "info": "#002b36"
+  },
+  "interface": {
+    "visitedLink": "#6c71c4",
+    "selection": "#657b83",
+    "selectionText": "#002b36",
+    "scrollbarThumb": "#586e75",
+    "scrollbarTrack": "#002b36"
+  }
+}

@@ -22,12 +22,13 @@ import {
   loadCustomThemes,
   loadSettings,
   SETTINGS_KEY,
+  themeCssKey,
   themeFor,
   type HostCache,
   type Settings,
 } from '../shared/settings.ts';
 import type { Labels } from '../shared/tokens.ts';
-import { customThemeCss, shadowCss } from '../themes/css.ts';
+import { shadowCss, themeVarsCss } from '../themes/css.ts';
 import { isBuiltin, type CustomThemes } from '../themes/index.ts';
 
 const MAX_JOBS_PER_MESSAGE = 10;
@@ -91,8 +92,9 @@ const shadows = new ShadowRoots(onNewShadowRoot);
  */
 const earlyHosts = new Set<Element>();
 let shadowSheetCss: string | undefined;
-/** A custom theme's colors (built-in themes ship theirs in themes.css). */
-const customThemeSheet = new CSSStyleSheet();
+/** The active theme's colors (variables); the shared rules come from themes.css. */
+const themeSheet = new CSSStyleSheet();
+let applying = 0;
 
 function originHost(): string {
   try {
@@ -125,27 +127,43 @@ async function start() {
   settings = loaded;
   customThemes = custom;
   cache = (stored[cacheKey(host)] as HostCache | undefined) ?? {};
-  applySettings();
   chrome.storage.onChanged.addListener(onStorageChanged);
+  await applySettings();
 }
 
-function applySettings() {
+/**
+ * The active theme's variables: a custom theme carries them compiled; a built-in theme's are
+ * compiled by the background once and then read from storage.
+ */
+async function themeVars(id: string): Promise<string> {
+  if (!isBuiltin(id)) {
+    const custom = customThemes[id];
+    return custom ? themeVarsCss(custom.compiled) : '';
+  }
+  const stored = (await chrome.storage.local.get(themeCssKey(id)))[themeCssKey(id)] as string | undefined;
+  return stored ?? ((await chrome.runtime.sendMessage({ type: 'theme-css', id }).catch(() => '')) as string);
+}
+
+async function applySettings() {
   const next = settings && themeFor(settings, siteHost, customThemes);
+  const attempt = ++applying;
   if (!next || fatalError) {
     theme = 'off';
     root.setAttribute('data-ute-theme', 'off');
     shadows.setCss('');
-    customThemeSheet.replaceSync('');
+    themeSheet.replaceSync('');
     earlyHosts.clear();
     stop();
     report();
     return;
   }
+  // Until the variables are in, the page stays crushed by the first-paint stylesheet (or keeps
+  // showing the previous theme). Editing a custom theme recolors open pages live.
+  const vars = await themeVars(next.id);
+  if (attempt !== applying) return; // settings changed again meanwhile
   theme = next.id;
-  // Custom themes' colors arrive as an adopted sheet; editing the theme recolors open pages live.
-  const custom = isBuiltin(next.id) ? undefined : customThemes[next.id];
-  customThemeSheet.replaceSync(custom ? customThemeCss(custom.compiled) : '');
-  if (custom) ensureDocumentSheet();
+  themeSheet.replaceSync(vars);
+  ensureDocumentSheet();
   root.setAttribute('data-ute-theme', next.id);
   shadows.setCss((shadowSheetCss ??= shadowCss()));
   if (!active) begin();
@@ -190,7 +208,7 @@ function stop() {
 }
 
 function ensureDocumentSheet() {
-  if (!document.adoptedStyleSheets.includes(customThemeSheet)) document.adoptedStyleSheets = [...document.adoptedStyleSheets, customThemeSheet];
+  if (!document.adoptedStyleSheets.includes(themeSheet)) document.adoptedStyleSheets = [...document.adoptedStyleSheets, themeSheet];
 }
 
 function onStorageChanged(changes: Record<string, chrome.storage.StorageChange>, area: string) {
@@ -279,7 +297,7 @@ function onPageEvent(event: Event) {
   } else if (event.type === SHEETS_EVENT) {
     const shadowRoot = target instanceof Element ? shadowRootOf(target, true) : null;
     if (shadowRoot) shadows.ensureAdopted(shadowRoot);
-    else if (!isBuiltin(theme)) ensureDocumentSheet(); // the page replaced document.adoptedStyleSheets
+    else if (theme !== 'off') ensureDocumentSheet(); // the page replaced document.adoptedStyleSheets
     restyle(shadowRoot ?? document, detail?.selectors ?? ['*']);
   } else if (event.type === RULES_EVENT) {
     restyle(detail?.constructed ? 'everywhere' : (target.getRootNode() as Document | ShadowRoot), detail?.selectors ?? ['*']);

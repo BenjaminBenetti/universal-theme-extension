@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "everforest-light-medium",
+  "name": "Everforest Light Medium",
+  "family": "Everforest",
+  "mode": "light",
+  "background": {
+    "page": "#fdf6e3",
+    "surface": "#f4f0d9",
+    "raised": "#efebd4",
+    "input": "#fdf6e3",
+    "control": "#e6e2cc",
+    "selected": "#bdc3af",
+    "code": "#f4f0d9",
+    "accent": "#739037",
+    "danger": "#ef4d4b",
+    "success": "#7c8f00",
+    "warning": "#b77a00",
+    "info": "#348fc0",
+    "highlight": "#faedcd",
+    "divider": "#e0dcc7",
+    "overlay": "rgba(85, 95, 102, 0.35)",
+    "accent-soft": "#f0f1d2",
+    "danger-soft": "#fde3da",
+    "success-soft": "#f0f1d2",
+    "warning-soft": "#faedcd",
+    "info-soft": "#e9f0e9"
+  },
+  "text": {
+    "text": "#555f66",
+    "strong": "#555f66",
+    "muted": "#708089",
+    "faint": "#939f91",
+    "link": "#348fc0",
+    "on-accent": "#555f66",
+    "accent": "#739037",
+    "danger": "#ef4d4b",
+    "success": "#7c8f00",
+    "warning": "#b77a00",
+    "info": "#348fc0"
+  },
+  "border": {
+    "subtle": "#e0dcc7",
+    "strong": "#939f91",
+    "accent": "#739037",
+    "danger": "#ef4d4b",
+    "success": "#7c8f00",
+    "warning": "#b77a00",
+    "info": "#348fc0"
+  },
+  "textOnFill": {
+    "accent": "#fdf6e3",
+    "danger": "#fdf6e3",
+    "success": "#fdf6e3",
+    "warning": "#fdf6e3",
+    "info": "#fdf6e3"
+  },
+  "interface": {
+    "visitedLink": "#d05bac",
+    "selection": "#eaedc8",
+    "selectionText": "#555f66",
+    "scrollbarThumb": "#a6b0a0",
+    "scrollbarTrack": "#fdf6e3"
+  }
+}

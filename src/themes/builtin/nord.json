@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "nord",
+  "name": "Nord",
+  "family": "Nord",
+  "mode": "dark",
+  "background": {
+    "page": "#2e3440",
+    "surface": "#3b4252",
+    "raised": "#3b4252",
+    "input": "#3b4252",
+    "control": "#434c5e",
+    "selected": "#4c566a",
+    "code": "#3b4252",
+    "accent": "#88c0d0",
+    "danger": "#bf616a",
+    "success": "#a3be8c",
+    "warning": "#ebcb8b",
+    "info": "#5e81ac",
+    "highlight": "#526c7a",
+    "divider": "#434c5e",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#40505d",
+    "danger-soft": "#4b3d48",
+    "success-soft": "#45504f",
+    "warning-soft": "#54524f",
+    "info-soft": "#384356"
+  },
+  "text": {
+    "text": "#d8dee9",
+    "strong": "#eceff4",
+    "muted": "#7b88a1",
+    "faint": "#616e88",
+    "link": "#88c0d0",
+    "on-accent": "#eceff4",
+    "accent": "#88c0d0",
+    "danger": "#bf616a",
+    "success": "#a3be8c",
+    "warning": "#ebcb8b",
+    "info": "#81a1c1"
+  },
+  "border": {
+    "subtle": "#434c5e",
+    "strong": "#616e88",
+    "accent": "#88c0d0",
+    "danger": "#bf616a",
+    "success": "#a3be8c",
+    "warning": "#ebcb8b",
+    "info": "#5e81ac"
+  },
+  "textOnFill": {
+    "accent": "#2e3440",
+    "danger": "#eceff4",
+    "success": "#2e3440",
+    "warning": "#2e3440",
+    "info": "#eceff4"
+  },
+  "interface": {
+    "visitedLink": "#b48ead",
+    "selection": "#434c5e",
+    "selectionText": "#eceff4",
+    "scrollbarThumb": "#4c566a",
+    "scrollbarTrack": "#2e3440"
+  }
+}

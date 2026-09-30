@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BUILTIN_THEMES } from '../src/themes/index.ts';
-import { allThemesCss, bootCss, compileTheme } from '../src/themes/css.ts';
+import { bootCss, sharedStylesheet } from '../src/themes/css.ts';
 import { validateTheme } from '../src/themes/format.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -24,7 +24,7 @@ async function writeStatic() {
     const errors = validateTheme(theme);
     if (errors.length) throw new Error(`src/themes/builtin/${theme.id}.json:\n  ${errors.join('\n  ')}`);
   }
-  await fs.writeFile(path.join(dist, 'themes.css'), allThemesCss(BUILTIN_THEMES.map(compileTheme)));
+  await fs.writeFile(path.join(dist, 'themes.css'), sharedStylesheet());
   for (const theme of BUILTIN_THEMES) await fs.writeFile(path.join(dist, 'boot', `${theme.id}.css`), bootCss(theme));
 
   for (const file of ['popup.html', 'options.html', 'editor.html', 'ui.css']) await fs.copyFile(path.join(root, 'src/ui', file), path.join(dist, file));

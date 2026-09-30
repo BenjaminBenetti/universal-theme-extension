@@ -1,23 +1,12 @@
 // The theme registry: built-in themes (JSON files in ./builtin) plus themes made in the editor.
 
-import gruvboxDarkHard from './builtin/gruvbox-dark-hard.json' with { type: 'json' };
-import gruvboxDarkMedium from './builtin/gruvbox-dark-medium.json' with { type: 'json' };
-import gruvboxDarkSoft from './builtin/gruvbox-dark-soft.json' with { type: 'json' };
-import gruvboxLightHard from './builtin/gruvbox-light-hard.json' with { type: 'json' };
-import gruvboxLightMedium from './builtin/gruvbox-light-medium.json' with { type: 'json' };
-import gruvboxLightSoft from './builtin/gruvbox-light-soft.json' with { type: 'json' };
+import builtin from './builtin/index.ts';
 import type { ThemeDefinition } from './format.ts';
 
 export type { ThemeDefinition } from './format.ts';
 
-export const BUILTIN_THEMES = [
-  gruvboxDarkHard,
-  gruvboxDarkMedium,
-  gruvboxDarkSoft,
-  gruvboxLightHard,
-  gruvboxLightMedium,
-  gruvboxLightSoft,
-] as ThemeDefinition[];
+/** Every built-in theme (src/themes/builtin/*.json, listed by `npm run themes -- index`). */
+export const BUILTIN_THEMES: ThemeDefinition[] = builtin;
 
 export const DEFAULT_THEME_ID = 'gruvbox-dark-medium';
 

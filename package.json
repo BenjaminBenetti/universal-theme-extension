@@ -13,7 +13,10 @@
     "screenshots": "npm run build && node scripts/screenshots.ts",
     "smoke": "npm run build && node scripts/smoke.ts",
     "schema": "node scripts/write-schema.mjs",
-    "ui-screenshots": "npm run build && node scripts/ui-screenshots.ts"
+    "ui-screenshots": "npm run build && node scripts/ui-screenshots.ts",
+    "themes": "node scripts/themes.mjs",
+    "gallery": "npm run build && node scripts/gallery.ts",
+    "icons": "node scripts/render-icons.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",

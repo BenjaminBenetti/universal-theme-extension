@@ -1,0 +1,66 @@
+{
+  "$schema": "../theme.schema.json",
+  "format": 1,
+  "id": "oceanic-next",
+  "name": "Oceanic Next",
+  "family": "Oceanic Next",
+  "mode": "dark",
+  "background": {
+    "page": "#1b2b34",
+    "surface": "#17242c",
+    "raised": "#343d46",
+    "input": "#17242c",
+    "control": "#4f5b66",
+    "selected": "#65737e",
+    "code": "#17242c",
+    "accent": "#5fb3b3",
+    "danger": "#ec5f67",
+    "success": "#99c794",
+    "warning": "#fac863",
+    "info": "#6699cc",
+    "highlight": "#565541",
+    "divider": "#343d46",
+    "overlay": "rgba(0, 0, 0, 0.6)",
+    "accent-soft": "#29464d",
+    "danger-soft": "#45353e",
+    "success-soft": "#344a47",
+    "warning-soft": "#484a3d",
+    "info-soft": "#2a4152"
+  },
+  "text": {
+    "text": "#cdd3de",
+    "strong": "#d8dee9",
+    "muted": "#a7adba",
+    "faint": "#65737e",
+    "link": "#6699cc",
+    "on-accent": "#d8dee9",
+    "accent": "#5fb3b3",
+    "danger": "#ec5f67",
+    "success": "#99c794",
+    "warning": "#fac863",
+    "info": "#6699cc"
+  },
+  "border": {
+    "subtle": "#343d46",
+    "strong": "#65737e",
+    "accent": "#5fb3b3",
+    "danger": "#ec5f67",
+    "success": "#99c794",
+    "warning": "#fac863",
+    "info": "#6699cc"
+  },
+  "textOnFill": {
+    "accent": "#1b2b34",
+    "danger": "#1b2b34",
+    "success": "#1b2b34",
+    "warning": "#1b2b34",
+    "info": "#1b2b34"
+  },
+  "interface": {
+    "visitedLink": "#c594c5",
+    "selection": "#4f5b66",
+    "selectionText": "#d8dee9",
+    "scrollbarThumb": "#4f5b66",
+    "scrollbarTrack": "#1b2b34"
+  }
+}
