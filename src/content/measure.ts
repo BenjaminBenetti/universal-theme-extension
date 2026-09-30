@@ -35,6 +35,8 @@ export interface Job {
   ask: Ask;
   /** Code-measured: the background is a pale tint, so soft-capable tokens use their "-soft" variant. */
   softBg: boolean;
+  /** Code-measured: fixed or sticky with a background, so it covers the page scrolling under it. */
+  covers?: boolean;
 }
 
 export interface Plan {
@@ -166,6 +168,7 @@ export class MeasurePass {
     let radius = 0;
     let shadow = false;
     const isControl = FORM_CONTROLS.has(tag) || el.getAttribute('role') === 'button' || el.getAttribute('role') === 'textbox';
+    const floats = cs.position === 'fixed' || cs.position === 'sticky';
     const ask: Ask = {};
     const facts: Record<string, string> = {};
     const sigParts: string[] = [];
@@ -228,13 +231,15 @@ export class MeasurePass {
       sigParts.push(`ink:${toHex(bg!)}`);
     } else if (!isTransparent(bg)) {
       // Background: only a decision when the box paints something distinct, or looks like a box.
+      // A fixed or sticky box always paints something: the page scrolls underneath it, so what is
+      // behind it now (often the same color) is not what it has to cover.
       radius = parseFloat(cs.borderTopLeftRadius) || 0;
       shadow = cs.boxShadow !== 'none';
       const distinct = !sameColor(composite(bg!, backdrop), backdrop, 3);
-      if (distinct || radius > 0 || shadow || isControl) {
+      if (distinct || radius > 0 || shadow || isControl || floats) {
         ask.bg = true;
         facts.background = `${describeColor(bg)}, ${describeRelation(bg!, backdrop)}`;
-        sigParts.push(`bg:${toHex(bg!)}/${bg!.a.toFixed(2)}`);
+        sigParts.push(`bg:${toHex(bg!)}/${bg!.a.toFixed(2)}${floats ? '/floats' : ''}`);
       }
     }
 
@@ -275,7 +280,7 @@ export class MeasurePass {
     if (inside) facts.inside = inside;
     facts.size = rect.width || rect.height ? `${Math.round(rect.width)}×${Math.round(rect.height)} px (${sizeClass})` : 'not currently visible';
     if (look.words) facts.look = look.words;
-    if (cs.position === 'fixed' || cs.position === 'sticky') facts.position = `${cs.position} on screen`;
+    if (floats) facts.position = `${cs.position} on screen; the page scrolls underneath it`;
     if (opacity < 0.05) facts.opacity = '0% (invisible until hovered, focused, or activated)';
     else if (opacity < 1) facts.opacity = `${Math.round(opacity * 100)}%`;
     if (cs.visibility === 'hidden') facts.visibility = 'hidden until activated';
@@ -287,7 +292,7 @@ export class MeasurePass {
       bgImage,
       ...(paper ? { paper } : {}),
       ...(retry ? { retry: true as const } : {}),
-      job: { sig: sigParts.join('|'), facts: { site: this.host, page: this.page, ...facts }, ask, softBg },
+      job: { sig: sigParts.join('|'), facts: { site: this.host, page: this.page, ...facts }, ask, softBg, ...(floats && ask.bg ? { covers: true } : {}) },
     };
   }
 

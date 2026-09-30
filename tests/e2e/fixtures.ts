@@ -15,6 +15,18 @@ export const FIXTURE = `<!doctype html>
   <div id="inline" style="background-color: rgb(255, 255, 0) !important; padding: 8px">inline !important</div>
 </body></html>`;
 
+/** A fixed header bar painted the same color as the page: the page scrolls under it. */
+export const FIXED = `<!doctype html>
+<html><head><meta charset="utf-8"><title>Fixed</title><style>
+  ${BASE}
+  body { background: #282f36; color: #ffffff; padding-top: 72px; }
+  #bar { position: fixed; top: 0; left: 0; right: 0; height: 72px; background: #282f36; }
+  .tile { background: #f1f3f4; color: #202124; height: 400px; margin: 16px 0; }
+</style></head><body>
+  <nav id="bar"><a href="#">Buy now</a></nav>
+  <div class="tile">scrolls under the bar</div><div class="tile">and this</div>
+</body></html>`;
+
 /** Web components: open, closed, nested, declarative, and late-upgraded shadow roots. */
 export const SHADOW = `<!doctype html>
 <html><head><meta charset="utf-8"><title>Shadow</title><style>${BASE}</style></head><body>

@@ -22,6 +22,14 @@ describe('buildRequest', () => {
     // Site and page are said once, not per element.
     expect((state as { elements: Record<string, object> }).elements.e1).not.toHaveProperty('site');
   });
+
+  it('never offers "inherit" (see-through) for a box the page scrolls under', () => {
+    const fixedBar = { ...job('a', { bg: true }), covers: true };
+    const { questions } = buildRequest('example.com', 'white page', [fixedBar, job('b', { bg: true })]);
+    expect(questions.e1_bg!.criteria).not.toHaveProperty('inherit');
+    expect(questions.e1_bg!.criteria).toHaveProperty('surface');
+    expect(questions.e2_bg!.criteria).toHaveProperty('inherit');
+  });
 });
 
 describe('parseAnswers', () => {

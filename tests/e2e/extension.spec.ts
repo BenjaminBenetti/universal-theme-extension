@@ -87,6 +87,14 @@ test('switching themes recolors the open page without calling Jev', async () => 
   expect(jev.calls).toBe(calls);
 });
 
+test('a fixed header the same color as the page stays solid over content scrolling under it', async () => {
+  await page.goto(`${jev.url}/fixed`);
+  await waitForThemed(page);
+  // Unasked, it would be transparent and the tiles would show through it.
+  expect(await page.getAttribute('#bar', 'data-ute-bg')).toBe('raised');
+  expect(await css('#bar', 'backgroundColor')).toBe(DARK.raised);
+});
+
 test('a site set to off is left exactly as the site made it', async () => {
   await ext.setSettings({ sites: { [jev.host]: 'off' } });
   await page.goto(`${jev.url}/fixture`);
