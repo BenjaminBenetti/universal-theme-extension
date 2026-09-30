@@ -165,6 +165,7 @@ extension from `chrome://extensions` after rebuilding.
 | `npm run themes -- derive\|check\|index` | Tools for built-in theme files (see Themes) |
 | `npm run gallery -- [url] [settle-ms]` | One page in every built-in theme as a contact sheet, real Jev |
 | `npm run video:capture` / `npm run video:render` | The marketing video (see `marketing/video/README.md`) |
+| `npm run store:images` | Chrome Web Store screenshots and promo tile (see `marketing/store/README.md`) |
 
 The real-Jev scripts read the key from `TYPESAFE_API_KEY`, or from `JEV_KEY` in `secrets.env`
 (git-ignored).
