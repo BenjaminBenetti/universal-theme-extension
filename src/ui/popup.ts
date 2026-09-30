@@ -1,5 +1,5 @@
 import type { TabStatus } from '../shared/messages.ts';
-import { cacheKey, CUSTOM_THEMES_KEY, loadCustomThemes, loadSettings, saveSettings } from '../shared/settings.ts';
+import { cacheKey, CUSTOM_THEMES_KEY, loadCustomThemes, loadSettings, modeFor, saveSettings, withSiteMode } from '../shared/settings.ts';
 import { findTheme, swatchesOf } from '../themes/index.ts';
 import { OFF_OPTION, themeOptions } from './common.ts';
 import { dockInky } from './inky.ts';
@@ -39,6 +39,14 @@ async function main() {
     },
   });
   sitePicker.disabled = !host;
+
+  const privacy = $<HTMLInputElement>('privacy');
+  privacy.checked = !!host && modeFor(settings, host) === 'privacy';
+  privacy.disabled = !host;
+  privacy.onchange = async () => {
+    if (!host) return;
+    settings = await saveSettings({ siteModes: withSiteMode(settings, host, privacy.checked ? 'privacy' : 'performance') });
+  };
   const defaultPicker = new ThemePicker($('default-picker'), {
     inputId: 'default-theme',
     options: [OFF_OPTION, ...themeOptions(custom)],

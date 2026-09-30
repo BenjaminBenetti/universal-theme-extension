@@ -274,7 +274,7 @@ export class MeasurePass {
 
     facts['behind it'] = nameColor(backdrop);
     facts.element = pseudo ? `::${pseudo} decoration of ${openTag(el)}` : openTag(el);
-    const text = pseudo ? cs.content.replace(/^["']|["']$/g, '').slice(0, 40) : textSample(el, 80);
+    const text = pseudo ? cs.content.replace(/^["']|["']$/g, '').slice(0, 40) : textSample(el, 128);
     if (text) facts.text = text;
     const inside = landmarks(el);
     if (inside) facts.inside = inside;
@@ -456,7 +456,8 @@ export function hasOwnText(el: Element): boolean {
 }
 
 function textSample(el: Element, max: number): string {
-  if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) return el.placeholder || el.value.slice(0, max);
+  // Never what someone typed: only the field's own hint.
+  if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) return el.placeholder.slice(0, max);
   const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
   let out = '';
   for (let n = walker.nextNode(); n && out.length < max; n = walker.nextNode()) {

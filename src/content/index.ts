@@ -12,6 +12,7 @@
 
 import { flatParent, RULES_EVENT, SHADOW_EVENT, SHEETS_EVENT, ShadowRoots, shadowRootOf, walk } from './dom.ts';
 import { MeasurePass, originals, type Job, type Plan } from './measure.ts';
+import { scrambleText } from './scramble.ts';
 import { StyleMemo } from './memo.ts';
 import { addSelector, collectColorSelectors, matchAll } from './styles.ts';
 import type { LabelRequest, LabelResponse, StatusQuery, TabStatus } from '../shared/messages.ts';
@@ -21,6 +22,7 @@ import {
   isExpired,
   loadCustomThemes,
   loadSettings,
+  modeFor,
   SETTINGS_KEY,
   themeCssKey,
   themeFor,
@@ -571,6 +573,11 @@ function queue(job: Job) {
   if (!inflight.has(job.sig) && !queued.has(job.sig)) queued.set(job.sig, job);
 }
 
+/** The job with its text scrambled (privacy mode). Scrambled here, as it leaves the page, so no path sends plain text. */
+function scrambled(job: Job): Job {
+  return job.facts.text === undefined ? job : { ...job, facts: { ...job.facts, text: scrambleText(job.facts.text) } };
+}
+
 function sendQueued() {
   if (fatalError) return;
   const jobs = [...queued.values()];
@@ -578,7 +585,7 @@ function sendQueued() {
   for (let i = 0; i < jobs.length; i += MAX_JOBS_PER_MESSAGE) {
     const batch = jobs.slice(i, i + MAX_JOBS_PER_MESSAGE);
     for (const job of batch) inflight.add(job.sig);
-    const request: LabelRequest = { type: 'label', host, page: pageWords, jobs: batch };
+    const request: LabelRequest = { type: 'label', host, page: pageWords, jobs: settings && modeFor(settings, host) === 'privacy' ? batch.map(scrambled) : batch };
     chrome.runtime
       .sendMessage(request)
       .then((res: LabelResponse) => onLabels(batch, res))

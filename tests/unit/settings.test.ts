@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { bootFileFor, bootScripts } from '../../src/background/registration.ts';
-import { DEFAULT_SETTINGS, isExpired, themeFor, type Settings } from '../../src/shared/settings.ts';
+import { DEFAULT_SETTINGS, isExpired, modeFor, themeFor, withSiteMode, type Settings } from '../../src/shared/settings.ts';
 import { compileTheme } from '../../src/themes/css.ts';
 import { findTheme, type CustomThemes } from '../../src/themes/index.ts';
 
@@ -31,6 +31,22 @@ describe('themeFor', () => {
 
   it('themes nothing without a Jev key', () => {
     expect(themeFor(settings({ apiKey: '' }), 'a.com')).toBeUndefined();
+  });
+});
+
+describe('text mode', () => {
+  it('ships in performance mode, with per-site overrides', () => {
+    expect(DEFAULT_SETTINGS.defaultMode).toBe('performance');
+    const s = settings({ siteModes: { 'a.com': 'privacy' } });
+    expect(modeFor(s, 'a.com')).toBe('privacy');
+    expect(modeFor(s, 'b.com')).toBe('performance');
+    expect(modeFor({ ...s, defaultMode: 'privacy' }, 'b.com')).toBe('privacy');
+  });
+
+  it('keeps a site override only while it differs from the default', () => {
+    const s = settings({ siteModes: { 'a.com': 'privacy' } });
+    expect(withSiteMode(s, 'b.com', 'privacy')).toEqual({ 'a.com': 'privacy', 'b.com': 'privacy' });
+    expect(withSiteMode(s, 'a.com', 'performance')).toEqual({});
   });
 });
 

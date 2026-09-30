@@ -3,6 +3,13 @@ import type { Labels } from './tokens.ts';
 
 export type ThemeChoice = string | 'off';
 
+/**
+ * How much of a page's text Jev reads. "performance": each element's text as it is (up to 128
+ * characters). "privacy": every letter and digit scrambled first, so Jev sees the shape of the
+ * text but not the words; a few labels (status pills, callouts) come out a little less apt.
+ */
+export type TextMode = 'performance' | 'privacy';
+
 export interface Settings {
   /** TypeSafe API key used to call Jev. Nothing is themed without it. */
   apiKey: string;
@@ -10,6 +17,10 @@ export interface Settings {
   defaultTheme: ThemeChoice;
   /** Per-hostname overrides. */
   sites: Record<string, ThemeChoice>;
+  /** Text mode for every site without an override. */
+  defaultMode: TextMode;
+  /** Per-hostname text mode overrides. */
+  siteModes: Record<string, TextMode>;
   /** How long Jev's labels for a site are trusted before Jev re-lays it out. */
   cacheHours: number;
   /** Development/testing only: alternative Jev endpoint (e.g. a local mock). */
@@ -20,6 +31,8 @@ export const DEFAULT_SETTINGS: Settings = {
   apiKey: '',
   defaultTheme: DEFAULT_THEME_ID,
   sites: {},
+  defaultMode: 'performance',
+  siteModes: {},
   cacheHours: 24,
 };
 
@@ -39,7 +52,7 @@ export type HostCache = Record<string, CacheEntry>;
 
 export async function loadSettings(): Promise<Settings> {
   const stored = (await chrome.storage.local.get(SETTINGS_KEY))[SETTINGS_KEY] as Partial<Settings> | undefined;
-  return { ...DEFAULT_SETTINGS, ...stored, sites: { ...stored?.sites } };
+  return { ...DEFAULT_SETTINGS, ...stored, sites: { ...stored?.sites }, siteModes: { ...stored?.siteModes } };
 }
 
 export async function saveSettings(patch: Partial<Settings>): Promise<Settings> {
@@ -75,6 +88,18 @@ export function themeFor(settings: Settings, host: string, custom: CustomThemes 
   // The chosen theme was deleted: behave as if the site had no choice of its own.
   if (settings.defaultTheme === 'off') return undefined;
   return findTheme(settings.defaultTheme, custom) ?? findTheme(DEFAULT_THEME_ID);
+}
+
+export function modeFor(settings: Settings, host: string): TextMode {
+  return settings.siteModes[host] ?? settings.defaultMode;
+}
+
+/** Site modes with `host` set to `mode`; a site that matches the default keeps no override. */
+export function withSiteMode(settings: Settings, host: string, mode: TextMode): Record<string, TextMode> {
+  const siteModes = { ...settings.siteModes };
+  if (mode === settings.defaultMode) delete siteModes[host];
+  else siteModes[host] = mode;
+  return siteModes;
 }
 
 export function isExpired(entry: CacheEntry, settings: Settings, now = Date.now()): boolean {

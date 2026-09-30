@@ -1,5 +1,5 @@
 import { DEFAULT_API_BASE } from '../background/jev.ts';
-import { CUSTOM_THEMES_KEY, deleteCustomTheme, loadCustomThemes, loadSettings, saveSettings, type Settings } from '../shared/settings.ts';
+import { CUSTOM_THEMES_KEY, deleteCustomTheme, loadCustomThemes, loadSettings, saveSettings, type Settings, type TextMode } from '../shared/settings.ts';
 import { DEFAULT_THEME_ID, findTheme, swatchesOf, type CustomThemes } from '../themes/index.ts';
 import { OFF_OPTION, themeOptions } from './common.ts';
 import { roamInky } from './inky.ts';
@@ -122,6 +122,12 @@ async function main() {
       settings = await saveSettings({ defaultTheme: value });
     },
   });
+
+  const mode = $<HTMLSelectElement>('default-mode');
+  mode.value = settings.defaultMode;
+  mode.onchange = async () => {
+    settings = await saveSettings({ defaultMode: mode.value as TextMode });
+  };
 
   const hours = $<HTMLInputElement>('cache-hours');
   hours.value = String(settings.cacheHours);

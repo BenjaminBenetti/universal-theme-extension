@@ -28,13 +28,15 @@ export interface MockJev {
   /** The same server under a different host name, for cross-site frames. */
   otherUrl: string;
   calls: number;
+  /** Every element Jev was asked about, as the facts it was sent. */
+  elements: Facts[];
   delayMs: number;
   status: number;
   close(): Promise<void>;
 }
 
 export async function startMockJev(): Promise<MockJev> {
-  const mock = { calls: 0, delayMs: 0, status: 200 } as MockJev;
+  const mock = { calls: 0, elements: [], delayMs: 0, status: 200 } as unknown as MockJev;
   const server = http.createServer((req, res) => {
     const pages: Record<string, () => string> = {
       '/fixture': () => FIXTURE,
@@ -70,6 +72,7 @@ export async function startMockJev(): Promise<MockJev> {
           return;
         }
         const { state, questions } = JSON.parse(body) as { state: { elements: Record<string, Facts> }; questions: Record<string, unknown> };
+        mock.elements.push(...Object.values(state.elements));
         const answers: Record<string, unknown> = {};
         for (const key of Object.keys(questions)) {
           const [id, kind] = key.split('_') as [string, string];

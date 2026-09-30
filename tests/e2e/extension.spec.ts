@@ -116,6 +116,47 @@ test('registers the first-paint stylesheet for the default theme', async () => {
   expect(scripts).toEqual([expect.objectContaining({ id: 'boot-default', css: ['boot/gruvbox-dark-medium.css'], runAt: 'document_start' })]);
 });
 
+const sentTexts = () => jev.elements.map((f) => f.text).filter((t): t is string => !!t);
+const storedSettings = async () => (await ext.storage()).settings as { defaultMode: string; siteModes: Record<string, string> };
+
+test('performance mode, the default, sends element text to Jev as it is', async () => {
+  await page.goto(`${jev.url}/fixture`);
+  await waitForThemed(page);
+  expect(sentTexts()).toContain('Hello link Go');
+});
+
+test('privacy mode scrambles element text before Jev sees it, and still themes the page', async () => {
+  await ext.setSettings({ siteModes: { [jev.host]: 'privacy' } });
+  await page.goto(`${jev.url}/fixture`);
+  await waitForThemed(page);
+  const sent = sentTexts();
+  expect(sent.join(' ')).not.toMatch(/Hello|link|inline/);
+  expect(sent).toContainEqual(expect.stringMatching(/^[A-Z][a-z]{4} [a-z]{4} [A-Z][a-z]$/)); // "Hello link Go", scrambled
+  expect(await css('#card', 'backgroundColor')).toBe(DARK.raised);
+});
+
+test('the popup switches privacy mode for the site it was opened on', async () => {
+  await page.goto(`${jev.url}/fixture`);
+  const popup = await ext.context.newPage();
+  await popup.goto(`chrome-extension://${new URL(ext.worker.url()).host}/popup.html`);
+  // The popup acts on the active tab: make the fixture active, then load the popup again.
+  await page.bringToFront();
+  await popup.reload();
+  await expect(popup.locator('#host')).toHaveText(jev.host);
+  await expect(popup.locator('#privacy')).not.toBeChecked();
+  await popup.locator('#privacy').check();
+  await expect.poll(async () => (await storedSettings()).siteModes).toEqual({ [jev.host]: 'privacy' });
+  await popup.locator('#privacy').uncheck();
+  await expect.poll(async () => (await storedSettings()).siteModes).toEqual({});
+});
+
+test('the settings page sets the text mode for all sites', async () => {
+  await page.goto(`chrome-extension://${new URL(ext.worker.url()).host}/options.html`);
+  await expect(page.locator('#default-mode')).toHaveValue('performance');
+  await page.selectOption('#default-mode', 'privacy');
+  await expect.poll(async () => (await storedSettings()).defaultMode).toBe('privacy');
+});
+
 test('the settings page saves a key that works', async () => {
   await ext.setSettings({ apiKey: '' });
   const id = new URL(ext.worker.url()).host;
