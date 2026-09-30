@@ -121,6 +121,10 @@ words in any order ("light hard", "gruv soft"), then pick with the mouse or ↑/
 
 ## Install
 
+Easiest: ask your AI coding agent (Claude Code, for example) to *"install the Chrome extension
+from https://github.com/BenjaminBenetti/universal-theme-extension/blob/main/SKILL.md"*. It downloads
+the latest release and walks you through the rest. Or by hand:
+
 1. Download the zip from the [latest release](https://github.com/BenjaminBenetti/universal-theme-extension/releases/latest)
    and unzip it.
 2. In Chrome, open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked**, and pick
