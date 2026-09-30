@@ -25,7 +25,7 @@ const heroHost = new URL(HERO_URL).hostname;
 /** The other sites, each shown in its own colors and then in three themes. */
 const SITES = [
   { id: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Octopus', settle: 1000, themes: ['catppuccin-latte', 'dracula', 'everforest-dark-medium'] },
-  { id: 'github', url: 'https://github.com/morhetz/gruvbox', settle: 500, themes: ['kanagawa-wave', 'rose-pine-dawn', 'github-dark-dimmed'] },
+  { id: 'hackernews', url: 'https://news.ycombinator.com/', settle: 500, themes: ['kanagawa-wave', 'rose-pine-dawn', 'github-dark-dimmed'] },
   { id: 'sheets', url: 'https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit', settle: 4000, themes: ['nord', 'solarized-light', 'synthwave-84'] },
   {
     id: 'excel',
@@ -109,15 +109,21 @@ async function tidyHero(page: Page) {
   await page.waitForTimeout(500);
 }
 
-/** Where Jev put each design role: a few boxes per token, in page CSS pixels. */
+/** Where Jev put each design role, for every labeled element actually on screen, in CSS pixels. */
 async function labelBoxes(page: Page) {
   return page.evaluate(() => {
     const out: Array<{ role: string; token: string; x: number; y: number; w: number; h: number; text: string }> = [];
-    const visible = (r: DOMRect) => r.width > 8 && r.height > 8 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
+    const inView = (r: DOMRect) => r.width > 8 && r.height > 8 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
+    // Hidden menus and popovers still take up space; only count what is painted on top at its center.
+    const onTop = (el: Element, r: DOMRect) => {
+      if (!el.checkVisibility({ opacityProperty: true, visibilityProperty: true })) return false;
+      const hit = document.elementFromPoint(Math.min(Math.max(r.left + r.width / 2, 0), innerWidth - 1), Math.min(Math.max(r.top + r.height / 2, 0), innerHeight - 1));
+      return !!hit && (hit === el || el.contains(hit));
+    };
     for (const [attr, role] of [['data-ute-bg', 'background'], ['data-ute-fg', 'text'], ['data-ute-bd', 'border']] as const) {
       for (const el of document.querySelectorAll(`[${attr}]`)) {
         const r = el.getBoundingClientRect();
-        if (!visible(r)) continue;
+        if (!inView(r) || !onTop(el, r)) continue;
         out.push({ role, token: el.getAttribute(attr)!, x: r.left, y: r.top, w: r.width, h: r.height, text: (el.textContent ?? '').trim().slice(0, 40) });
       }
     }
@@ -146,6 +152,13 @@ await tidyHero(hero);
 await shot(hero, 'hero-original');
 console.log('hero: original');
 if (process.env.CAPTURE_ONLY === 'original') {
+  await ext.close();
+  process.exit(0);
+}
+if (process.env.CAPTURE_ONLY === 'labels') {
+  await setTheme(ext, heroHost, 'tokyo-night');
+  await waitForSwitch(hero, 'tokyo-night');
+  fs.writeFileSync(path.join(OUT, 'hero-labels.json'), JSON.stringify(await labelBoxes(hero), null, 1));
   await ext.close();
   process.exit(0);
 }

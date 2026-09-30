@@ -187,6 +187,7 @@ const PUNCH_HOLD = BAR; // one bar on "75 themes"
 const SITE_INFO: Record<string, { name: string; title: string; icon: Favicon }> = {
   wikipedia: { name: 'Wikipedia', title: 'Octopus - Wikipedia', icon: 'wikipedia' },
   github: { name: 'GitHub', title: 'GitHub - morhetz/gruvbox', icon: 'github' },
+  hackernews: { name: 'Hacker News', title: 'Hacker News', icon: 'hackernews' },
   sheets: { name: 'Google Sheets', title: 'Example Spreadsheet - Google Sheets', icon: 'sheets' },
   excel: { name: 'Excel', title: 'Financial Sample.xlsx', icon: 'excel' },
 };
@@ -529,7 +530,7 @@ function bubbles(t: number) {
 // ---------------------------------------------------------------------------------------------
 // The browser window
 
-type Favicon = 'nexus' | 'wikipedia' | 'github' | 'sheets' | 'excel';
+type Favicon = 'page' | 'wikipedia' | 'github' | 'hackernews' | 'sheets' | 'excel';
 interface Tab {
   title: string;
   url: string;
@@ -557,7 +558,8 @@ function favicon(kind: Favicon, x: number, y: number) {
     ctx.font = font;
     ctx.fillText(text, x + 8, y + 8.5);
   };
-  if (kind === 'nexus') letter('#4f7cff', '#ffffff', 'N', `800 10px ${SANS}`, true);
+  if (kind === 'page') letter('#8ab4f8', '#202124', '•', `800 10px ${SANS}`, true);
+  if (kind === 'hackernews') letter('#ff6600', '#ffffff', 'Y', `700 11px ${SANS}`, false);
   if (kind === 'wikipedia') letter('#f8f9fa', '#202122', 'W', `700 11px Georgia, serif`, true);
   if (kind === 'github') letter('#f0f6fc', '#1f2328', 'G', `800 10px ${SANS}`, true);
   if (kind === 'excel') letter('#107c41', '#ffffff', 'X', `800 10px ${SANS}`, false);
@@ -787,7 +789,18 @@ function dissolve(from: string, to: string, p: number, mode: 'random' | 'sweep' 
   }
 }
 
-const HERO_TAB = (): Tab => ({ title: manifest.hero.title, url: manifest.hero.url, icon: 'nexus' });
+/** A tab icon for a page, by its site. */
+function iconFor(url: string): Favicon {
+  const host = new URL(url).hostname;
+  if (host.endsWith('github.com')) return 'github';
+  if (host.endsWith('wikipedia.org')) return 'wikipedia';
+  if (host.endsWith('ycombinator.com')) return 'hackernews';
+  if (host === 'docs.google.com') return 'sheets';
+  if (host.endsWith('officeapps.live.com')) return 'excel';
+  return 'page';
+}
+
+const HERO_TAB = (): Tab => ({ title: manifest.hero.title, url: manifest.hero.url, icon: iconFor(manifest.hero.url) });
 
 // ---------------------------------------------------------------------------------------------
 // Captions
@@ -1095,19 +1108,44 @@ function drawPopup(t: number) {
   ctx.restore();
 }
 
-/** The labels Jev gave the page, drawn as the scan line passes over them. */
-const TAGGED: Array<[LabelBox['role'], string, number, number]> = [
-  ['background', 'accent', 1120, 17],
-  ['background', 'control', 834, 17],
-  ['text', 'accent', 1122, 115],
-  ['background', 'selected', 60, 67],
-  ['border', 'accent', 372, 151],
-  ['background', 'input', 372, 487],
-  ['background', 'raised', 372, 550],
-  ['text', 'strong', 477, 559],
-  ['background', 'success-soft', 1117, 559],
+/** Roles worth a name tag during the scan, most telling first. */
+const TAG_WANTS: Array<[LabelBox['role'], string]> = [
+  ['background', 'accent'],
+  ['background', 'surface'],
+  ['background', 'input'],
+  ['background', 'control'],
+  ['background', 'raised'],
+  ['background', 'selected'],
+  ['text', 'link'],
+  ['text', 'strong'],
+  ['text', 'muted'],
+  ['background', 'code'],
+  ['background', 'success'],
+  ['border', 'subtle'],
 ];
-const isTagged = (b: LabelBox) => TAGGED.some(([role, token, x, y]) => b.role === role && b.token === token && Math.abs(b.x - x) < 2 && Math.abs(b.y - y) < 2);
+let tagged = new Set<LabelBox>();
+
+/** Up to nine boxes to name: one per wanted role, fully on screen, tags not overlapping. */
+function pickTags(boxes: LabelBox[]): Set<LabelBox> {
+  const picked: LabelBox[] = [];
+  const tagOf = (b: LabelBox) => ({ x: b.x, y: Math.max(0, b.y - 10), w: b.token.length * 8 + 12, h: 19 });
+  const clash = (a: LabelBox, b: LabelBox) => {
+    const p = tagOf(a);
+    const q = tagOf(b);
+    return p.x < q.x + q.w + 10 && q.x < p.x + p.w + 10 && p.y < q.y + q.h + 6 && q.y < p.y + p.h + 6;
+  };
+  for (const [role, token] of TAG_WANTS) {
+    if (picked.length >= 9) break;
+    const choice = boxes
+      .filter((b) => b.role === role && b.token === token && b.w >= 16 && b.h >= 12 && b.w * b.h <= VIEW.w * VIEW.h * 0.25)
+      .filter((b) => b.x >= 0 && b.y >= 10 && b.x + b.w <= VIEW.w && b.y + b.h <= VIEW.h - 10)
+      .sort((a, b) => b.w * b.h - a.w * a.h)
+      .find((b) => !picked.some((p) => clash(b, p)));
+    if (choice) picked.push(choice);
+  }
+  return new Set(picked);
+}
+const isTagged = (b: LabelBox) => tagged.has(b);
 const labelTime = (b: LabelBox) => lerp(HOW.scan[0], HOW.scan[1], clamp(b.y / VIEW.h));
 
 function drawLabels(t: number) {
@@ -1882,6 +1920,7 @@ export async function init() {
     if (!document.fonts.check(f)) throw new Error(`Font did not load: ${f}`);
   }
   plan();
+  tagged = pickTags(labels);
   const popups = ['popup-0', 'popup-1', 'popup-2', ...[1, 2, 3, 4, 5].map((k) => `popup-type-${k}`)];
   const names = [
     'hero-original',
