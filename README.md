@@ -1,6 +1,30 @@
 # universal-theme-extension
 Apply color themes universally to chrome! Any web page any theme! WHAT! O yes!
 
+## Install
+
+**Copy and paste this into your AI agent** (Claude Code, Codex, Cursor…). It downloads the extension
+and walks you through the rest:
+
+```text
+Install the Chrome extension from https://raw.githubusercontent.com/BenjaminBenetti/universal-theme-extension/main/SKILL.md
+```
+
+You'll need a TypeSafe API key from [console.typesafe.ai](https://console.typesafe.ai).
+
+<details>
+<summary>Or install it by hand</summary>
+
+1. Download the zip from the [latest release](https://github.com/BenjaminBenetti/universal-theme-extension/releases/latest)
+   and unzip it somewhere it can stay.
+2. In Chrome, open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked**, and pick
+   the unzipped folder.
+3. The settings page opens: paste your TypeSafe API key and save.
+
+</details>
+
+## What it does
+
 Pick one of 75 built-in themes (or make your own) as the default for every site, or per site. The
 extension asks [Jev](https://docs.typesafe.ai) — TypeSafe AI's decision model — what every element on
 the page *is* (page, card, input, primary button, muted text, link, divider…), and the theme decides what
@@ -118,19 +142,6 @@ Pages only ever receive their active theme's colors, so shipping more themes cos
 
 Theme pickers (popup and settings) are type-ahead. Type any part of a name, family, or mode, with
 words in any order ("light hard", "gruv soft"), then pick with the mouse or ↑/↓ and Enter.
-
-## Install
-
-Easiest: ask your AI coding agent (Claude Code, for example) to *"install the Chrome extension
-from https://github.com/BenjaminBenetti/universal-theme-extension/blob/main/SKILL.md"*. It downloads
-the latest release and walks you through the rest. Or by hand:
-
-1. Download the zip from the [latest release](https://github.com/BenjaminBenetti/universal-theme-extension/releases/latest)
-   and unzip it.
-2. In Chrome, open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked**, and pick
-   the unzipped folder.
-3. The settings page opens: paste a TypeSafe API key from [console.typesafe.ai](https://console.typesafe.ai)
-   and save.
 
 ## Setup (from source)
 
