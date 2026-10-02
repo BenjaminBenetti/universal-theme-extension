@@ -1,6 +1,6 @@
 {
   "name": "universal-theme-extension",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "Apply color themes to any website, with Jev deciding what every element is.",
   "type": "module",
