@@ -75,6 +75,7 @@ import oxocarbonDark from './oxocarbon-dark.json' with { type: 'json' };
 import oxocarbonLight from './oxocarbon-light.json' with { type: 'json' };
 import horizonDark from './horizon-dark.json' with { type: 'json' };
 import horizonLight from './horizon-light.json' with { type: 'json' };
+import pastelDreams from './pastel-dreams.json' with { type: 'json' };
 import type { ThemeDefinition } from '../format.ts';
 
 export default [
@@ -153,4 +154,5 @@ export default [
   oxocarbonLight,
   horizonDark,
   horizonLight,
+  pastelDreams,
 ] as ThemeDefinition[];

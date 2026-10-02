@@ -25,7 +25,7 @@ You'll need a TypeSafe API key from [console.typesafe.ai](https://console.typesa
 
 ## What it does
 
-Pick one of 75 built-in themes (or make your own) as the default for every site, or per site. The
+Pick one of 76 built-in themes (or make your own) as the default for every site, or per site. The
 extension asks [Jev](https://docs.typesafe.ai) — TypeSafe AI's decision model — what every element on
 the page *is* (page, card, input, primary button, muted text, link, divider…), and the theme decides what
 color each of those roles gets.
