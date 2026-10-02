@@ -33,6 +33,24 @@ export const FIXED = `<!doctype html>
   <div id="card"><div id="month" role="heading" aria-level="2">Jun 2026</div><div class="tile">a note</div></div>
 </body></html>`;
 
+/**
+ * Graphics: a two-tone icon (white glyph on a colored tile), a wordmark drawn in currentColor, a
+ * dark logo whose colors are kept, and a see-through layer laid over text.
+ */
+const CHEVRON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='black' fill='none' stroke-width='2'/%3E%3C/svg%3E";
+export const GRAPHICS = `<!doctype html>
+<html><head><meta charset="utf-8"><title>Graphics</title><style>${BASE}
+  #menu { all: unset; display: inline-flex; align-items: center; gap: 4px; color: #202124; }
+  #menu::after { content: ""; width: 12px; height: 12px; background-color: currentColor; -webkit-mask: url("${CHEVRON}") center / contain no-repeat; mask: url("${CHEVRON}") center / contain no-repeat; }
+</style></head><body>
+  <button id="menu">Menu</button>
+  <svg class="icon" id="two-tone" width="24" height="24" viewBox="0 0 24 24"><rect id="tile" width="24" height="24" rx="6" fill="#4f46e5"/><path id="glyph" d="M7 12h10M12 7v10" fill="none" stroke="#ffffff" stroke-width="3"/></svg>
+  <svg class="wordmark" id="wordmark" width="120" height="24" viewBox="0 0 120 24" style="color: #24292f"><rect x="0" y="4" width="120" height="16" fill="currentColor"/></svg>
+  <svg id="logo" width="120" height="24" viewBox="0 0 120 24"><rect x="0" y="4" width="100" height="16" fill="#171d27"/><circle cx="110" cy="12" r="6" fill="#ff6201"/></svg>
+  <div id="plus" style="position: relative; display: inline-block; padding: 4px 8px">Plus<span id="layer" style="position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4)"></span></div>
+  <p>color: <span class="swatch" id="swatch" style="color: #0000a4">#0000a4</span></p>
+</body></html>`;
+
 /** Web components: open, closed, nested, declarative, and late-upgraded shadow roots. */
 export const SHADOW = `<!doctype html>
 <html><head><meta charset="utf-8"><title>Shadow</title><style>${BASE}</style></head><body>

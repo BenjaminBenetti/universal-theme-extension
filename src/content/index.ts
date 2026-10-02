@@ -11,6 +11,7 @@
 //   4. Boxes with nothing to decide (transparent, inherited) are resolved without asking Jev.
 
 import { flatParent, RULES_EVENT, SHADOW_EVENT, SHEETS_EVENT, ShadowRoots, shadowRootOf, walk } from './dom.ts';
+import { isTransparent, toHex } from '../shared/color.ts';
 import { MeasurePass, originals, type Job, type Plan } from './measure.ts';
 import { scrambleText } from './scramble.ts';
 import { StyleMemo } from './memo.ts';
@@ -548,15 +549,32 @@ function apply(el: Element, plans: Plan[]) {
     const l: Labels = (plan.job && cache[plan.job.sig]?.l) || {};
     // Re-tinted line art keeps its own background: the filter maps that paper to the page color.
     const retinted = !plan.pseudo && l.graphic === 'lineart' && plan.paper !== undefined;
+    const kept = !plan.pseudo && l.graphic === 'keep';
+    // A kept logo drawn as ink for one kind of paper is re-tinted when the theme is the other kind.
+    const keptInk = kept && plan.ink === true && plan.paper !== undefined;
+    // An <svg> that is re-tinted keeps its own color too: its shapes may paint with it
+    // (currentColor), and recoloring them first would undo the re-tint.
+    const ownColor = el.localName === 'svg' && (retinted || keptInk) ? originals.get(el)?.fg : undefined;
     setAttr(el, `${prefix}-bg`, retinted ? 'content' : l.bg);
-    setAttr(el, `${prefix}-fg`, l.fg);
+    setAttr(el, `${prefix}-fg`, ownColor ? undefined : l.fg);
     setAttr(el, `${prefix}-ink`, l.ink);
     setAttr(el, `${prefix}-bd`, l.border);
     setAttr(el, `${prefix}-strip`, plan.bgImage === 'strip' ? '' : undefined);
+    setAttr(el, `${prefix}-a`, plan.alpha !== undefined && l.bg ? String(plan.alpha) : undefined);
+    // A text color kept as content (syntax colors, a colored value) keeps its hue; the theme's CSS
+    // only moves its lightness into a readable range.
+    setAttr(el, `${prefix}-own-fg`, l.fg === 'content' ? plan.fg : undefined);
     if (!plan.pseudo) {
       setAttr(el, 'data-ute-g', l.graphic);
-      setAttr(el, 'data-ute-paper', l.graphic === 'lineart' ? plan.paper : undefined);
+      // Line art is re-tinted from its paper. A logo kept as it is, drawn as ink for one kind of
+      // paper, is re-tinted only on a theme of the other brightness (the theme's CSS decides).
+      // A picture icon (an <img> or a background image, not an <svg>) is tinted by its ink's tone,
+      // which needs the paper it was drawn for too.
+      const pictureIcon = l.graphic === 'icon' && el.localName !== 'svg';
+      setAttr(el, 'data-ute-paper', l.graphic === 'lineart' || pictureIcon || keptInk ? plan.paper : undefined);
+      setAttr(el, 'data-ute-own-color', ownColor && !isTransparent(ownColor) ? toHex(ownColor) : undefined);
       setAttr(el, 'data-ute-paint', plan.paint);
+      setAttr(el, 'data-ute-knock', plan.knock);
       setAttr(el, 'data-ute-cover', plan.cover !== undefined ? '' : undefined);
     }
   }

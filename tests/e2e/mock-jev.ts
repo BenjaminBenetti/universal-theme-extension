@@ -2,7 +2,7 @@
 // server is also reachable as localhost, which the app fixture uses as a second site for its frame.
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { APP, FIXED, FIXTURE, FRAME, SHADOW } from './fixtures.ts';
+import { APP, FIXED, FIXTURE, FRAME, GRAPHICS, SHADOW } from './fixtures.ts';
 
 type Facts = Record<string, string>;
 
@@ -12,12 +12,15 @@ function decide(kind: string, facts: Facts): string {
     case 'bg':
       return /blue/.test(facts.background ?? '') ? 'accent' : /red|pink/.test(facts.background ?? '') ? 'danger' : 'raised';
     case 'fg':
+      if (/class="swatch/.test(facts.element ?? '')) return 'content';
       return facts.element?.startsWith('<a') ? 'link' : /red/.test(facts['text color'] ?? '') ? 'danger' : 'text';
     case 'ink':
       return 'muted';
     case 'border':
       return 'subtle';
     default:
+      if (/class="icon/.test(facts.element ?? '')) return 'icon';
+      if (/class="wordmark/.test(facts.element ?? '')) return 'lineart';
       return facts.element?.startsWith('<canvas') ? 'lineart' : 'keep';
   }
 }
@@ -41,6 +44,7 @@ export async function startMockJev(): Promise<MockJev> {
     const pages: Record<string, () => string> = {
       '/fixture': () => FIXTURE,
       '/fixed': () => FIXED,
+      '/graphics': () => GRAPHICS,
       '/shadow': () => SHADOW,
       '/app': () => APP(`${mock.otherUrl}/frame`),
       '/frame': () => FRAME,

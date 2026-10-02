@@ -15,6 +15,15 @@ describe('parseColor', () => {
     expect(parseColor('currentcolor')).toBeNull();
   });
 
+  it('reads lab() and lch(), which Tailwind 4 sites produce', () => {
+    // The CSS Color 4 spec's own example: lab(29.2345% 39.3825 20.0664) is rgb(125 35 41).
+    expect(toHex(c('lab(29.2345% 39.3825 20.0664)'))).toBe('#7d2329');
+    expect(toHex(c('lch(29.2345% 44.2 27)'))).toBe('#7d2329');
+    expect(toHex(c('lab(100 0 0)'))).toBe('#ffffff');
+    expect(toHex(c('lab(0 0 0)'))).toBe('#000000');
+    expect(c('lab(50% 0 0 / 0.5)').a).toBe(0.5);
+  });
+
   it('treats near-zero alpha as transparent', () => {
     expect(isTransparent(c('rgba(0, 0, 0, 0)'))).toBe(true);
     expect(isTransparent(c('rgba(0, 0, 0, 0.5)'))).toBe(false);

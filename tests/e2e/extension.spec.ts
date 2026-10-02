@@ -101,6 +101,43 @@ test('fixed and sticky boxes that match what they sit on stay solid, in that col
   expect(await css('#month', 'backgroundColor')).toBe(DARK.accent);
 });
 
+test('graphics keep their details and stay visible on a dark theme', async () => {
+  await page.goto(`${jev.url}/graphics`);
+  await waitForThemed(page);
+  const attr = (selector: string, name: string) => page.getAttribute(selector, name);
+  const cdp = (selector: string, prop: Parameters<typeof style>[2]) => style(page, selector, prop);
+
+  // A two-tone icon: the tile takes the icon color, the white glyph is cut out to what it sits on.
+  expect(await attr('#tile', 'data-ute-paint')).toBe('fill');
+  expect(await attr('#glyph', 'data-ute-paint')).toBeNull();
+  expect(await attr('#glyph', 'data-ute-knock')).toBe('stroke');
+  expect(await cdp('#tile', 'fill')).toBe(DARK.text);
+  expect(await cdp('#glyph', 'stroke')).toBe(DARK.base); // it sits on the page
+
+  // A button's ::after mask icon (a dropdown chevron) is labeled, so it keeps an ink color.
+  expect(await attr('#menu', 'data-ute-after-ink')).toBe('muted');
+
+  // A wordmark re-tinted as line art keeps its own ink color, so the re-tint isn't undone.
+  expect(await attr('#wordmark', 'data-ute-g')).toBe('lineart');
+  expect(await attr('#wordmark', 'data-ute-own-color')).toBe('#24292f');
+  expect(await cdp('#wordmark', 'color')).toBe('rgb(36, 41, 47)');
+  expect(await cdp('#wordmark', 'filter')).not.toBe('none');
+
+  // A dark logo whose colors are kept is re-tinted on a dark theme instead of vanishing.
+  expect(await attr('#logo', 'data-ute-g')).toBe('keep');
+  expect(await attr('#logo', 'data-ute-paper')).toBe('light');
+  expect(await cdp('#logo', 'filter')).not.toBe('none');
+
+  // A text color kept as content (a syntax color) keeps its hue but is lightened to be readable.
+  expect(await attr('#swatch', 'data-ute-fg')).toBe('content');
+  expect(await attr('#swatch', 'data-ute-own-fg')).toBe('#0000a4');
+  expect(await cdp('#swatch', 'color')).toMatch(/^oklch\(0\.72 /);
+
+  // A see-through layer over text stays see-through.
+  expect(await attr('#layer', 'data-ute-a')).toBe('4');
+  expect(await cdp('#layer', 'backgroundColor')).toMatch(/\/ 0\.4\)$/);
+});
+
 test('a site set to off is left exactly as the site made it', async () => {
   await ext.setSettings({ sites: { [jev.host]: 'off' } });
   await page.goto(`${jev.url}/fixture`);

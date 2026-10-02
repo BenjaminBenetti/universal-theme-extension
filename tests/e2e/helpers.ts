@@ -19,7 +19,7 @@ export function colorsOf(themeId: string) {
   };
 }
 
-type Prop = 'backgroundColor' | 'color' | 'borderBottomColor' | 'filter';
+type Prop = 'backgroundColor' | 'color' | 'borderBottomColor' | 'filter' | 'fill' | 'stroke';
 
 const sessions = new WeakMap<Page | Frame, CDPSession>();
 

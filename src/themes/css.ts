@@ -66,6 +66,13 @@ export function compileTheme(theme: ThemeDefinition): CompiledTheme {
     // Line art (canvas grids, document pages, wordmarks): its paper becomes the page, its ink the text.
     '--ute-retint-light-paper': retintFilter('light', theme.background.page, theme.text.text),
     '--ute-retint-dark-paper': retintFilter('dark', theme.background.page, theme.text.text),
+    // A logo kept as it is, drawn as ink for light paper, would vanish on a dark page (and the
+    // other way round): re-tinted only on a theme of the other brightness.
+    '--ute-keep-light-paper': theme.mode === 'dark' ? retintFilter('light', theme.background.page, theme.text.text) : 'none',
+    '--ute-keep-dark-paper': theme.mode === 'light' ? retintFilter('dark', theme.background.page, theme.text.text) : 'none',
+    // Text colors kept as content stay readable: their OKLCH lightness is clamped into this range.
+    '--ute-content-l-min': theme.mode === 'dark' ? '0.72' : '0',
+    '--ute-content-l-max': theme.mode === 'dark' ? '1' : '0.55',
   };
   for (const [token, color] of Object.entries(theme.background)) vars[`--ute-bg-${token}`] = color;
   for (const [token, color] of Object.entries(theme.text)) vars[`--ute-fg-${token}`] = color;
@@ -148,6 +155,10 @@ function sharedCss(tokens: ReturnType<typeof tokenNames>, scope: 'document' | 's
       // --ute-behind: the color this box's content sits on, for fixed and sticky boxes inside it.
       const behind = suffix ? '' : `; --ute-behind: var(--ute-bg-${token})`;
       rule(`${ON} [${attr}-bg="${token}"]${M}${suffix}`, `background-color: var(--ute-bg-${token}) !important${behind}`);
+      // A see-through layer keeps its transparency (--ute-a). Overlays carry the theme's own.
+      if (token !== 'overlay') {
+        rule(`${ON} [${attr}-a][${attr}-bg="${token}"]${M}${suffix}`, `background-color: rgb(from var(--ute-bg-${token}) r g b / calc(alpha * var(--ute-a, 1))) !important`);
+      }
     }
     for (const token of tokens.fg) rule(`${ON} [${attr}-fg="${token}"]${M}${suffix}`, `color: var(--ute-fg-${token}) !important`);
     for (const token of tokens.border) rule(`${ON} [${attr}-bd="${token}"]${M}${suffix}`, `border-color: var(--ute-bd-${token}) !important`);
@@ -170,16 +181,43 @@ function sharedCss(tokens: ReturnType<typeof tokenNames>, scope: 'document' | 's
   rule(`${icon} [data-ute-paint="fill"]${M}, ${icon} [data-ute-paint="both"]${M}`, 'fill: currentColor !important');
   rule(`${icon} [data-ute-paint="stroke"]${M}, ${icon} [data-ute-paint="both"]${M}`, 'stroke: currentColor !important');
   rule(`${ON} :not(svg, canvas)[data-ute-g="icon"]${M}`, 'filter: var(--ute-icon-filter) !important');
+  // An icon picture whose paper is known is re-tinted like line art instead: a single tint would
+  // flatten a two-tone icon (a check over a paler one, a glyph on a tile) into one silhouette.
+  rule(`${ON} :not(svg, canvas)[data-ute-g="icon"][data-ute-paper="light"]${M}`, 'filter: var(--ute-retint-light-paper) !important');
+  rule(`${ON} :not(svg, canvas)[data-ute-g="icon"][data-ute-paper="dark"]${M}`, 'filter: var(--ute-retint-dark-paper) !important');
+  // Neutral details of a recolored multi-color icon are cut out to what the icon sits on.
+  rule(`${icon} [data-ute-knock="fill"]${M}, ${icon} [data-ute-knock="both"]${M}`, 'fill: var(--ute-behind, var(--ute-bg-page)) !important');
+  rule(`${icon} [data-ute-knock="stroke"]${M}, ${icon} [data-ute-knock="both"]${M}`, 'stroke: var(--ute-behind, var(--ute-bg-page)) !important');
   // Line art (Jev's call) re-tinted from the paper it was drawn on (code's measurement).
   rule(`${ON} [data-ute-g="lineart"][data-ute-paper="light"]${M}`, 'filter: var(--ute-retint-light-paper) !important');
   rule(`${ON} [data-ute-g="lineart"][data-ute-paper="dark"]${M}`, 'filter: var(--ute-retint-dark-paper) !important');
+  // Kept logos drawn as ink for the other brightness of paper are re-tinted too (none otherwise).
+  rule(`${ON} [data-ute-g="keep"][data-ute-paper="light"]${M}`, 'filter: var(--ute-keep-light-paper, none) !important');
+  rule(`${ON} [data-ute-g="keep"][data-ute-paper="dark"]${M}`, 'filter: var(--ute-keep-dark-paper, none) !important');
+  // A kept or re-tinted <svg> keeps its own color, which its shapes may paint with.
+  rule(`${ON} svg[data-ute-own-color]${M}`, 'color: attr(data-ute-own-color type(<color>)) !important');
+  // Text colors kept as content (syntax highlighting, a colored value) keep their hue and chroma,
+  // with lightness clamped so they stay readable on the theme's page.
+  for (const { suffix, attr } of BOXES) {
+    rule(
+      `${ON} [${attr}-fg="content"][${attr}-own-fg]${M}${suffix}`,
+      `color: oklch(from attr(${attr}-own-fg type(<color>)) clamp(var(--ute-content-l-min, 0), l, var(--ute-content-l-max, 1)) c h) !important`,
+    );
+  }
+  // See-through layers: their transparency, in tenths.
+  for (const { suffix, attr } of BOXES) {
+    for (let a = 1; a <= 9; a++) rule(`${ON} [${attr}-a="${a}"]${M}${suffix}`, `--ute-a: 0.${a}`);
+  }
 
   return out.join('\n');
 }
 
 /** The rules every theme shares, shipped as the content-script stylesheet (themes.css). */
+/** --ute-a never inherits: only the see-through layer itself is see-through, not what it holds. */
+const PROPERTIES = '@property --ute-a { syntax: "<number>"; inherits: false; initial-value: 1; }\n';
+
 export function sharedStylesheet(): string {
-  return `/* Generated by scripts/build.mjs — do not edit. */\n@layer ute {\n${sharedCss(tokenNames(), 'document')}\n}\n`;
+  return `/* Generated by scripts/build.mjs — do not edit. */\n${PROPERTIES}@layer ute {\n${sharedCss(tokenNames(), 'document')}\n}\n`;
 }
 
 /** The stylesheet adopted into shadow roots while a theme is active. Colors come from inherited variables. */

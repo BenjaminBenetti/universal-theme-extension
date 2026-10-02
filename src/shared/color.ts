@@ -24,7 +24,7 @@ function parseNumbers(body: string): number[] {
     .map((part) => (part.endsWith('%') ? parseFloat(part) / 100 : part === 'none' ? 0 : parseFloat(part)));
 }
 
-/** Parses the color formats `getComputedStyle` produces (rgb/rgba, color(srgb), oklch, oklab, hex). */
+/** Parses the color formats `getComputedStyle` produces (rgb/rgba, color(srgb), oklch, oklab, lab, lch, hex). */
 export function parseColor(input: string | null | undefined): RGBA | null {
   if (!input) return null;
   const s = input.trim().toLowerCase();
@@ -58,6 +58,23 @@ export function parseColor(input: string | null | undefined): RGBA | null {
     case 'oklab': {
       const [l = 0, A = 0, B = 0, a = 1] = nums;
       return { ...oklabToRgb(l, A, B), a: clamp(a, 0, 1) };
+    }
+    case 'lab':
+    case 'lch': {
+      // CIE Lab/LCh: lightness 0–100 (100% = 100), a/b ±125 (±100% = ±125), chroma 0–150 (100% = 150).
+      const parts = body.replace(/\//g, ' / ').trim().split(/\s+/);
+      const slash = parts.indexOf('/');
+      const channels = (slash < 0 ? parts : parts.slice(0, slash)).map((part, i) => {
+        if (part === 'none') return 0;
+        const v = parseFloat(part);
+        if (!part.endsWith('%')) return v;
+        return i === 0 ? v : (v / 100) * (name === 'lab' || i === 2 ? 125 : 150);
+      });
+      const alphaPart = slash < 0 ? undefined : parts[slash + 1];
+      const a = alphaPart === undefined ? 1 : alphaPart.endsWith('%') ? parseFloat(alphaPart) / 100 : parseFloat(alphaPart);
+      const [L = 0, x = 0, y = 0] = channels;
+      const [A, B] = name === 'lab' ? [x, y] : [x * Math.cos((y * Math.PI) / 180), x * Math.sin((y * Math.PI) / 180)];
+      return { ...labToRgb(L, A, B), a: clamp(a, 0, 1) };
     }
     default:
       return null;
@@ -144,6 +161,28 @@ export function toOklch({ r, g, b }: RGBA): Oklch {
 export function fromOklch({ l, c, h }: Oklch): RGBA {
   const rad = (h * Math.PI) / 180;
   return { ...oklabToRgb(l, c * Math.cos(rad), c * Math.sin(rad)), a: 1 };
+}
+
+/** CIE Lab (D50, as CSS defines lab()) → sRGB, clamped into gamut. */
+function labToRgb(L: number, A: number, B: number): Omit<RGBA, 'a'> {
+  const e = 216 / 24389;
+  const k = 24389 / 27;
+  const fy = (L + 16) / 116;
+  const fx = fy + A / 500;
+  const fz = fy - B / 200;
+  const x = (fx ** 3 > e ? fx ** 3 : (116 * fx - 16) / k) * 0.96422;
+  const y = L > k * e ? fy ** 3 : L / k;
+  const z = (fz ** 3 > e ? fz ** 3 : (116 * fz - 16) / k) * 0.82521;
+  // Bradford D50 → D65, then XYZ → linear sRGB.
+  const X = 0.955473421488075 * x - 0.02309845494876471 * y + 0.06325924320057072 * z;
+  const Y = -0.0283697093338637 * x + 1.0099953980813041 * y + 0.021041441191917323 * z;
+  const Z = 0.012314014864481998 * x - 0.020507649298898964 * y + 1.330365926242124 * z;
+  const conv = (v: number) => clamp(linearToSrgb(v) * 255, 0, 255);
+  return {
+    r: conv(3.2409699419045226 * X - 1.537383177570094 * Y - 0.4986107602930034 * Z),
+    g: conv(-0.9692436362808796 * X + 1.8759675015077202 * Y + 0.04155505740717559 * Z),
+    b: conv(0.05563007969699366 * X - 0.20397695888897652 * Y + 1.0569715142428786 * Z),
+  };
 }
 
 function oklabToRgb(L: number, A: number, B: number): Omit<RGBA, 'a'> {

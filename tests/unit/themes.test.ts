@@ -127,7 +127,7 @@ describe('generated CSS', () => {
   const css = sharedStylesheet();
 
   it('ships one shared rule set and no theme colors in the page stylesheet', () => {
-    expect(css.match(/\[data-ute-bg="raised"\]:not\(\[data-ute-m\]\) \{/g)).toHaveLength(1);
+    expect(css.match(/ \[data-ute-bg="raised"\]:not\(\[data-ute-m\]\) \{/g)).toHaveLength(1);
     expect(css).not.toContain(':root[data-ute-theme="');
   });
 
@@ -148,8 +148,33 @@ describe('generated CSS', () => {
   });
 
   it('lives in a cascade layer and wins with !important', () => {
-    expect(css).toMatch(/^\/\*.*\*\/\n@layer ute \{/);
+    // @property registrations come first: they cannot live inside a layer.
+    expect(css).toMatch(/^\/\*.*\*\/\n(@property [^\n]*\n)*@layer ute \{/);
     expect(css).toContain('background-color: var(--ute-base) !important');
+  });
+
+  it('re-tints kept logos only on a theme of the other brightness', () => {
+    for (const theme of compiled) {
+      const dark = theme.mode === 'dark';
+      expect(theme.vars['--ute-keep-light-paper']).toBe(dark ? theme.vars['--ute-retint-light-paper'] : 'none');
+      expect(theme.vars['--ute-keep-dark-paper']).toBe(dark ? 'none' : theme.vars['--ute-retint-dark-paper']);
+    }
+    expect(css).toContain('[data-ute-g="keep"][data-ute-paper="light"]');
+    expect(css).toContain('color: attr(data-ute-own-color type(<color>))');
+  });
+
+  it('keeps text colors kept as content readable: lighter on dark themes, darker on light ones', () => {
+    for (const theme of compiled) {
+      expect(theme.vars['--ute-content-l-min']).toBe(theme.mode === 'dark' ? '0.72' : '0');
+      expect(theme.vars['--ute-content-l-max']).toBe(theme.mode === 'dark' ? '1' : '0.55');
+    }
+    expect(css).toContain('[data-ute-fg="content"][data-ute-own-fg]');
+  });
+
+  it('keeps see-through layers see-through, and only them', () => {
+    expect(css).toMatch(/@property --ute-a \{[^}]*inherits: false/);
+    expect(css).toContain('[data-ute-a][data-ute-bg="raised"]:not([data-ute-m]) { background-color: rgb(from var(--ute-bg-raised) r g b / calc(alpha * var(--ute-a, 1))) !important }');
+    expect(css).not.toContain('[data-ute-a][data-ute-bg="overlay"]');
   });
 
   it('crushes the first paint to the base color', () => {

@@ -46,9 +46,14 @@ export interface Plan {
   bgImage: 'none' | 'strip' | 'keep';
   /** SVG shapes and <img> are handled by their graphic label; they only need this flag. */
   paint?: 'fill' | 'stroke' | 'both';
+  /**
+   * A white, gray, or black detail in a multi-color icon (a glyph on a colored tile): when the icon
+   * is recolored, it takes the color of what the icon sits on, as if cut out of the tile.
+   */
+  knock?: 'fill' | 'stroke' | 'both';
   /** An <img> that has not loaded yet: measure it again once it has pixels to look at. */
   deferred?: true;
-  /** A <canvas> that had nothing drawn yet: measure it again a little later. */
+  /** A <canvas> that had nothing drawn yet, or a background picture still loading: measure it again a little later. */
   retry?: true;
   /**
    * Code-measured "paper" of a graphic: the background it was drawn for. A spreadsheet canvas is
@@ -62,6 +67,18 @@ export interface Plan {
    * takes the color of what it sits on instead of turning see-through.
    */
   cover?: true;
+  /**
+   * Code-measured: a graphic drawn as ink on a transparent background (a logo on the page), so it
+   * was made for `paper`. If its colors are kept, it is re-tinted on a theme of the other brightness.
+   */
+  ink?: true;
+  /**
+   * Code-measured: an empty, positioned layer painted with a see-through color (a tint laid over
+   * content). Its theme color keeps that transparency, in tenths, so it never hides what is under it.
+   */
+  alpha?: number;
+  /** The box's own text color (hex), kept and only made readable if Jev says it is content. */
+  fg?: string;
 }
 
 const WHITE: RGBA = { r: 255, g: 255, b: 255, a: 1 };
@@ -69,6 +86,8 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 const SHAPES = new Set(['path', 'circle', 'rect', 'ellipse', 'line', 'polyline', 'polygon', 'text', 'tspan', 'use']);
 const LANDMARKS = new Set(['header', 'nav', 'main', 'footer', 'aside', 'form', 'dialog', 'table', 'li', 'button', 'a', 'label', 'pre', 'code', 'blockquote', 'figure', 'menu']);
 const FORM_CONTROLS = new Set(['input', 'textarea', 'select', 'button']);
+/** Controls whose ::before/::after don't render (a <button>'s do, and often hold its icon). */
+const NO_PSEUDO = new Set(['input', 'textarea', 'select']);
 const MEDIA = new Set(['video', 'iframe', 'embed', 'object', 'picture', 'audio']);
 const GRAPHICS = new Set(['svg', 'img', 'canvas']);
 
@@ -141,7 +160,9 @@ export class MeasurePass {
     if (el.namespaceURI === SVG_NS && tag !== 'svg') {
       // Shapes inside an <svg> follow the <svg>'s graphic label; just record what they paint.
       originals.set(el, { fg, behind: inherited.behind });
-      return [{ el, pseudo: '', bgImage: 'none', paint: shapePaint(cs) }];
+      const main = svgInkOf(el);
+      const knock = shapeKnock(cs, main);
+      return [{ el, pseudo: '', bgImage: 'none', paint: shapePaint(cs, main), ...(knock ? { knock } : {}) }];
     }
 
     const bg = backgroundOf(cs);
@@ -151,7 +172,7 @@ export class MeasurePass {
     if (tag === 'img' && !(el as HTMLImageElement).complete) return [{ el, pseudo: '', bgImage: 'none', deferred: true }];
 
     const plans: Plan[] = [this.planBox(el, '', cs, fg, inherited.behind, inherited.fg)];
-    if (!GRAPHICS.has(tag) && !MEDIA.has(tag) && !FORM_CONTROLS.has(tag)) {
+    if (!GRAPHICS.has(tag) && !MEDIA.has(tag) && !NO_PSEUDO.has(tag)) {
       for (const pseudo of ['before', 'after'] as const) {
         const ps = getComputedStyle(el, `::${pseudo}`);
         if (ps.content === 'none' || ps.content === 'normal' || ps.display === 'none') continue;
@@ -177,6 +198,7 @@ export class MeasurePass {
     const facts: Record<string, string> = {};
     const sigParts: string[] = [];
     let paper: Plan['paper'];
+    let ink = false;
     let retry = false;
 
     // Icons that are pictures without being <img>: an element replaced by `content: url(sprite)`
@@ -193,6 +215,16 @@ export class MeasurePass {
         facts.picture = `${basename(pictureUrl)} (${replacedBy !== undefined ? 'shown in place of the element, one slice of a sprite sheet' : "painted as the element's background"})`;
         sigParts.push(`pic:${basename(pictureUrl)}@${replacedBy !== undefined ? `${cs.left},${cs.top}` : cs.backgroundPosition}`);
         paper = paperOf(backdrop); // drawn for what it sits on
+        // A whole background picture (not a slice of a sprite sheet) can be looked at like an
+        // <img>: the browser already has it. A two-tone icon is then described as two-tone.
+        const picture = replacedBy === undefined ? loadedPicture(pictureUrl, el.getBoundingClientRect(), cs.backgroundSize) : undefined;
+        if (picture === 'loading') retry = true; // look again once the browser hands it over
+        const pixels = picture && picture !== 'loading' ? probePixels(picture, true) : undefined;
+        if (pixels) {
+          facts.pixels = pixels.words;
+          sigParts.push(`px:${pixels.sig}`);
+          if (pixels.paper) paper = pixels.paper;
+        }
       }
     }
 
@@ -202,6 +234,10 @@ export class MeasurePass {
         const fills = svgPaints(el);
         facts.colors = fills.length ? fills.map((c) => nameColor(c)).join(', ') : 'uses the surrounding text color';
         paper = paperForInk(toneOf(fills.length ? fills : fg ? [fg] : []));
+        if (isTransparent(bg)) ink = true;
+        const main = svgMainPaint(el);
+        if (main) svgInk.set(el, main);
+        else svgInk.delete(el);
         sigParts.push(fills.map((c) => toHex(c)).join(','));
         // Which text role an icon takes if Jev decides to recolor it.
         ask.fg = true;
@@ -217,6 +253,7 @@ export class MeasurePass {
           facts.pixels = pixels.words;
           sigParts.push(`px:${pixels.sig}`);
           paper = pixels.opaque ? pixels.paper : (ownPaper ?? pixels.paper);
+          if (tag === 'img' && !pixels.opaque && !ownPaper) ink = true;
           retry = tag === 'canvas' && pixels.sig === 'empty';
         } else if (tag === 'canvas') {
           // Drawn off the main thread (OffscreenCanvas) or tainted: judge by what it sits on.
@@ -289,11 +326,18 @@ export class MeasurePass {
     if (cs.visibility === 'hidden') facts.visibility = 'hidden until activated';
 
     const softBg = ask.bg ? isSoftTint(bg!, backdrop) : false;
+    // A see-through tint laid over content (an empty absolutely positioned box, or a decorative
+    // ::before) stays see-through, or its theme color would cover the content under it.
+    const empty = pseudo ? /^(["'])\1$/.test(cs.content.trim()) : el.childElementCount === 0 && !hasOwnText(el);
+    const layer = ask.bg && bg!.a < 0.95 && (cs.position === 'absolute' || cs.position === 'fixed') && empty;
     return {
       el,
       pseudo,
       bgImage,
       ...(paper ? { paper } : {}),
+      ...(ink && paper ? { ink: true as const } : {}),
+      ...(layer ? { alpha: Math.max(1, Math.round(bg!.a * 10)) } : {}),
+      ...(fg && !isTransparent(fg) ? { fg: toHex(fg) } : {}),
       ...(retry ? { retry: true as const } : {}),
       ...cover,
       job: { sig: sigParts.join('|'), facts: { site: this.host, page: this.page, ...facts }, ask, softBg },
@@ -353,10 +397,74 @@ function describeLook(radius: number, shadow: boolean, sizeClass: string): { wor
   return { words: words.join(', '), sig: `${radius > 0 ? 'r' : ''}${shadow ? 's' : ''}` };
 }
 
-function shapePaint(cs: CSSStyleDeclaration): Plan['paint'] {
-  const fill = cs.fill !== 'none' && !isTransparent(parseColor(cs.fill));
-  const stroke = cs.stroke !== 'none' && !isTransparent(parseColor(cs.stroke)) && parseFloat(cs.strokeWidth) > 0;
+/**
+ * What a shape paints that an icon recolor should take over. In a multi-color icon (a white glyph
+ * on a colored tile) only the icon's main color is recolored, so the details keep their own color.
+ */
+function shapePaint(cs: CSSStyleDeclaration, main?: RGBA): Plan['paint'] {
+  const paints = (value: string) => {
+    if (value === 'none') return false;
+    const c = parseColor(value);
+    return !isTransparent(c) && (!main || near(c!, main));
+  };
+  const fill = paints(cs.fill);
+  const stroke = paints(cs.stroke) && parseFloat(cs.strokeWidth) > 0;
   return fill && stroke ? 'both' : stroke ? 'stroke' : fill ? 'fill' : undefined;
+}
+
+/** What a shape paints in a neutral (white, gray, black) color other than the icon's main color. */
+function shapeKnock(cs: CSSStyleDeclaration, main?: RGBA): Plan['knock'] {
+  if (!main) return undefined;
+  const neutral = (value: string) => {
+    if (value === 'none') return false;
+    const c = parseColor(value);
+    return !isTransparent(c) && !near(c!, main) && toOklch(c!).c < 0.04;
+  };
+  const fill = neutral(cs.fill);
+  const stroke = neutral(cs.stroke) && parseFloat(cs.strokeWidth) > 0;
+  return fill && stroke ? 'both' : stroke ? 'stroke' : fill ? 'fill' : undefined;
+}
+
+/** The main paint color of each multi-color <svg>, recorded when the <svg> is measured. */
+const svgInk = new WeakMap<Element, RGBA>();
+
+function svgInkOf(shape: Element): RGBA | undefined {
+  for (let a = shape.parentElement; a && a.namespaceURI === SVG_NS; a = a.parentElement) {
+    const main = svgInk.get(a);
+    if (main) return main;
+  }
+  return undefined;
+}
+
+const near = (a: RGBA, b: RGBA) => Math.hypot(a.r - b.r, a.g - b.g, a.b - b.b) < 48;
+
+/**
+ * The color covering most of an <svg>'s area, when it paints in more than one color; undefined for
+ * single-color icons (all of them is recolored, as before).
+ */
+function svgMainPaint(svg: Element): RGBA | undefined {
+  const areas: Array<{ color: RGBA; area: number }> = [];
+  let n = 0;
+  for (const shape of svg.querySelectorAll('*')) {
+    if (!SHAPES.has(shape.localName) || ++n > 60) continue;
+    const cs = getComputedStyle(shape);
+    let area = 1;
+    try {
+      const box = (shape as SVGGraphicsElement).getBBox();
+      area = Math.max(1, box.width * box.height);
+    } catch {
+      // Not rendered: count it once.
+    }
+    for (const value of [cs.fill, cs.stroke]) {
+      const color = value === 'none' ? null : parseColor(value);
+      if (!color || isTransparent(color)) continue;
+      const group = areas.find((g) => near(g.color, color));
+      if (group) group.area += area;
+      else areas.push({ color, area });
+    }
+  }
+  if (areas.length < 2) return undefined;
+  return areas.sort((a, b) => b.area - a.area)[0]!.color;
 }
 
 function svgPaints(svg: Element): RGBA[] {
@@ -373,6 +481,34 @@ function svgPaints(svg: Element): RGBA[] {
   return [...seen.values()].slice(0, 6);
 }
 
+const pictures = new Map<string, HTMLImageElement>();
+
+/**
+ * A background picture to look at, if it is drawn whole: scaled to its box, or about the size of
+ * it, not a large sprite sheet shown a slice at a time. "loading" until the browser hands it over.
+ */
+function loadedPicture(url: string, box: DOMRect, size: string): HTMLImageElement | 'loading' | undefined {
+  let img = pictures.get(url);
+  if (!img) {
+    if (pictures.size > 200) pictures.clear();
+    img = new Image();
+    img.src = url;
+    pictures.set(url, img);
+  }
+  if (!img.complete) return 'loading';
+  // An SVG without its own width and height has no natural size, but draws at any size.
+  if (!img.naturalWidth) return isSvg(img) ? img : undefined;
+  // Drawn size: scaled to the box (contain, cover, 100%), given in pixels, or its natural size.
+  const [w, h] = size.split(/\s+/).map((v) => (v.endsWith('px') ? parseFloat(v) : NaN));
+  const scaled = /contain|cover|100%/.test(size);
+  const drawnW = scaled ? box.width : Number.isNaN(w!) ? img.naturalWidth : w!;
+  const drawnH = scaled ? box.height : h !== undefined && !Number.isNaN(h) ? h : Number.isNaN(w!) ? img.naturalHeight : (w! / img.naturalWidth) * img.naturalHeight;
+  const whole = drawnW <= Math.max(48, box.width * 1.5) && drawnH <= Math.max(48, box.height * 1.5);
+  return whole ? img : undefined;
+}
+
+const isSvg = (img: HTMLImageElement) => /^data:image\/svg|\.svg([?#]|$)/i.test(img.currentSrc || img.src);
+
 let probeCanvas: CanvasRenderingContext2D | null | undefined;
 const PROBE = 24;
 
@@ -386,7 +522,7 @@ function probePixels(
   always: boolean,
 ): { words: string; sig: string; paper: Plan['paper']; opaque: boolean } | undefined {
   const rect = source.getBoundingClientRect();
-  const hasPixels = source instanceof HTMLCanvasElement ? source.width > 0 && source.height > 0 : source.naturalWidth > 0;
+  const hasPixels = source instanceof HTMLCanvasElement ? source.width > 0 && source.height > 0 : source.naturalWidth > 0 || (source.complete && isSvg(source));
   if (!hasPixels || (!always && rect.width * rect.height > 360 * 160)) return undefined;
   if (probeCanvas === undefined) {
     const canvas = document.createElement('canvas');
