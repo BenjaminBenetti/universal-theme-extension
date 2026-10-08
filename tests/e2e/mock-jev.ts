@@ -2,7 +2,7 @@
 // server is also reachable as localhost, which the app fixture uses as a second site for its frame.
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { APP, FIXED, FIXTURE, FRAME, GRAPHICS, SHADOW } from './fixtures.ts';
+import { APP, AVATAR_PNG, AVATARS, DYNAMIC, FIXED, FIXTURE, FRAME, GRAPHICS, SHADOW } from './fixtures.ts';
 
 type Facts = Record<string, string>;
 
@@ -21,6 +21,8 @@ function decide(kind: string, facts: Facts): string {
     default:
       if (/class="icon/.test(facts.element ?? '')) return 'icon';
       if (/class="wordmark/.test(facts.element ?? '')) return 'lineart';
+      // Like the real Jev: a tiny unnamed avatar it cannot see passes for an icon.
+      if (/class="avatar/.test(facts.element ?? '')) return facts.pixels ? 'keep' : 'icon';
       return facts.element?.startsWith('<canvas') ? 'lineart' : 'keep';
   }
 }
@@ -45,6 +47,8 @@ export async function startMockJev(): Promise<MockJev> {
       '/fixture': () => FIXTURE,
       '/fixed': () => FIXED,
       '/graphics': () => GRAPHICS,
+      '/dynamic': () => DYNAMIC,
+      '/avatars': () => AVATARS(mock.otherUrl),
       '/shadow': () => SHADOW,
       '/app': () => APP(`${mock.otherUrl}/frame`),
       '/frame': () => FRAME,
@@ -53,6 +57,11 @@ export async function startMockJev(): Promise<MockJev> {
     if (page) {
       res.writeHead(200, { 'content-type': 'text/html' });
       res.end(page());
+      return;
+    }
+    if (req.url === '/avatar.png') {
+      res.writeHead(200, { 'content-type': 'image/png' });
+      res.end(AVATAR_PNG);
       return;
     }
     if (req.url === '/v1/models') {

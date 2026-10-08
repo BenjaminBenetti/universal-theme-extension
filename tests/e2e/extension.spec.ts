@@ -138,6 +138,41 @@ test('graphics keep their details and stay visible on a dark theme', async () =>
   expect(await cdp('#layer', 'backgroundColor')).toMatch(/\/ 0\.4\)$/);
 });
 
+test('a message that arrives mid-animation is labeled by its resting colors', async () => {
+  await page.goto(`${jev.url}/dynamic`);
+  await waitForThemed(page);
+  await page.evaluate(() => (window as unknown as { addMessage(id: string, isNew: boolean): void }).addMessage('flash', true));
+  // While it flashes it may be measured red; once the animation is over it must not stay red.
+  await expect.poll(() => page.getAttribute('#flash', 'data-ute'), { timeout: 5000 }).toBe('');
+  await page.waitForTimeout(2500);
+  await waitForThemed(page);
+  // At rest it has no background of its own.
+  expect(await page.getAttribute('#flash', 'data-ute-bg')).toBeNull();
+});
+
+test('a message that appears under the pointer is labeled by its colors without hover', async () => {
+  await page.goto(`${jev.url}/dynamic`);
+  await waitForThemed(page);
+  // The pointer rests on the list, so a new message arrives already in its hover color.
+  await page.hover('#m0');
+  await page.evaluate(() => (window as unknown as { addMessage(id: string, isNew: boolean): void }).addMessage('hovered', false));
+  await expect.poll(() => page.getAttribute('#hovered', 'data-ute'), { timeout: 5000 }).toBe('');
+  // The pointer moves away: the hover color must not stay.
+  await page.mouse.move(5, 5);
+  await page.waitForTimeout(800);
+  await waitForThemed(page);
+  expect(await page.getAttribute('#hovered', 'data-ute-bg')).toBeNull();
+});
+
+test("another site's image is seen through the background, so an avatar stays a photo", async () => {
+  await page.goto(`${jev.url}/avatars`);
+  await waitForThemed(page);
+  // The page may not read the avatar's pixels (it is from another site); the background reads them.
+  const avatar = jev.elements.find((f) => f.element?.includes('class="avatar"'));
+  expect(avatar?.pixels).toMatch(/fills its whole box/);
+  expect(await page.getAttribute('#avatar', 'data-ute-g')).toBe('keep');
+});
+
 test('a site set to off is left exactly as the site made it', async () => {
   await ext.setSettings({ sites: { [jev.host]: 'off' } });
   await page.goto(`${jev.url}/fixture`);

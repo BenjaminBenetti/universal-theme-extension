@@ -16,7 +16,9 @@ import {
   toOklch,
   type RGBA,
 } from '../shared/color.ts';
+import { describePixels, paperForInk, paperOf, SAMPLE, toneOf, type PixelInfo } from '../shared/pixels.ts';
 import { flatParent } from './dom.ts';
+import { remotePixels } from './pixels.ts';
 
 export type Pseudo = '' | 'before' | 'after';
 
@@ -35,6 +37,11 @@ export interface Job {
   ask: Ask;
   /** Code-measured: the background is a pale tint, so soft-capable tokens use their "-soft" variant. */
   softBg: boolean;
+  /**
+   * Code-measured: a picture that fills its whole box with solid pixels (a photo, an avatar). It has
+   * no shape of its own to paint in one color, so it can't be a single-color icon.
+   */
+  filled?: boolean;
 }
 
 export interface Plan {
@@ -79,6 +86,8 @@ export interface Plan {
   alpha?: number;
   /** The box's own text color (hex), kept and only made readable if Jev says it is content. */
   fg?: string;
+  /** An image from another site whose pixels the background is reading: measured again once it answers. */
+  waitPixels?: string;
 }
 
 const WHITE: RGBA = { r: 255, g: 255, b: 255, a: 1 };
@@ -200,6 +209,16 @@ export class MeasurePass {
     let paper: Plan['paper'];
     let ink = false;
     let retry = false;
+    let waitPixels: string | undefined;
+    let filled = false;
+    /** Pixels of a picture this script may read, or the background's reading of another site's. */
+    const seePixels = (source: HTMLImageElement | HTMLCanvasElement, url: string, always: boolean): PixelInfo | 'unreadable' | undefined => {
+      const local = probePixels(source, always);
+      if (local !== 'unreadable' || source instanceof HTMLCanvasElement) return local;
+      const remote = remotePixels(url);
+      if (remote === 'waiting') waitPixels = url;
+      return remote && remote !== 'waiting' ? remote : 'unreadable';
+    };
 
     // Icons that are pictures without being <img>: an element replaced by `content: url(sprite)`
     // (Google Docs' toolbar), or a small childless box painted with a background image.
@@ -219,11 +238,13 @@ export class MeasurePass {
         // <img>: the browser already has it. A two-tone icon is then described as two-tone.
         const picture = replacedBy === undefined ? loadedPicture(pictureUrl, el.getBoundingClientRect(), cs.backgroundSize) : undefined;
         if (picture === 'loading') retry = true; // look again once the browser hands it over
-        const pixels = picture && picture !== 'loading' ? probePixels(picture, true) : undefined;
+        const seen = picture && picture !== 'loading' ? seePixels(picture, pictureUrl, true) : undefined;
+        const pixels = seen === 'unreadable' ? undefined : seen;
         if (pixels) {
           facts.pixels = pixels.words;
           sigParts.push(`px:${pixels.sig}`);
           if (pixels.paper) paper = pixels.paper;
+          if (pixels.opaque) filled = true;
         }
       }
     }
@@ -243,15 +264,18 @@ export class MeasurePass {
         ask.fg = true;
       } else {
         const source = el as HTMLImageElement | HTMLCanvasElement;
-        if (tag === 'img') sigParts.push(basename((source as HTMLImageElement).currentSrc || (source as HTMLImageElement).src || ''));
+        const url = tag === 'img' ? (source as HTMLImageElement).currentSrc || (source as HTMLImageElement).src || '' : '';
+        if (tag === 'img') sigParts.push(basename(url));
         // Photos are recognizable from name and size; canvases never are, so always look at those.
-        const pixels = probePixels(source, tag === 'canvas');
+        const seen = seePixels(source, url, tag === 'canvas');
+        const pixels = seen === 'unreadable' ? undefined : seen;
         // A graphic's own background is its paper when its pixels do not cover it (spreadsheet
         // engines draw black text on a transparent canvas and let CSS paint the white).
         const ownPaper = isTransparent(bg) ? undefined : paperOf(composite(bg!, backdrop));
         if (pixels) {
           facts.pixels = pixels.words;
           sigParts.push(`px:${pixels.sig}`);
+          if (pixels.opaque) filled = true;
           paper = pixels.opaque ? pixels.paper : (ownPaper ?? pixels.paper);
           if (tag === 'img' && !pixels.opaque && !ownPaper) ink = true;
           retry = tag === 'canvas' && pixels.sig === 'empty';
@@ -338,9 +362,10 @@ export class MeasurePass {
       ...(ink && paper ? { ink: true as const } : {}),
       ...(layer ? { alpha: Math.max(1, Math.round(bg!.a * 10)) } : {}),
       ...(fg && !isTransparent(fg) ? { fg: toHex(fg) } : {}),
+      ...(waitPixels ? { waitPixels } : {}),
       ...(retry ? { retry: true as const } : {}),
       ...cover,
-      job: { sig: sigParts.join('|'), facts: { site: this.host, page: this.page, ...facts }, ask, softBg },
+      job: { sig: sigParts.join('|'), facts: { site: this.host, page: this.page, ...facts }, ask, softBg, ...(filled ? { filled } : {}) },
     };
   }
 
@@ -510,7 +535,7 @@ function loadedPicture(url: string, box: DOMRect, size: string): HTMLImageElemen
 const isSvg = (img: HTMLImageElement) => /^data:image\/svg|\.svg([?#]|$)/i.test(img.currentSrc || img.src);
 
 let probeCanvas: CanvasRenderingContext2D | null | undefined;
-const PROBE = 24;
+const PROBE = SAMPLE;
 
 /**
  * Jev cannot see pixels, so code looks at small images (icons, logos, wordmarks) and at canvases
@@ -520,7 +545,7 @@ const PROBE = 24;
 function probePixels(
   source: HTMLImageElement | HTMLCanvasElement,
   always: boolean,
-): { words: string; sig: string; paper: Plan['paper']; opaque: boolean } | undefined {
+): PixelInfo | 'unreadable' | undefined {
   const rect = source.getBoundingClientRect();
   const hasPixels = source instanceof HTMLCanvasElement ? source.width > 0 && source.height > 0 : source.naturalWidth > 0 || (source.complete && isSvg(source));
   if (!hasPixels || (!always && rect.width * rect.height > 360 * 160)) return undefined;
@@ -536,56 +561,9 @@ function probePixels(
     probeCanvas.drawImage(source, 0, 0, PROBE, PROBE);
     data = probeCanvas.getImageData(0, 0, PROBE, PROBE).data;
   } catch {
-    return undefined; // tainted by cross-origin pixels
+    return 'unreadable'; // another site's image: only the background may read it
   }
-  const inks: RGBA[] = [];
-  for (let i = 0; i < data.length; i += 4) {
-    if (data[i + 3]! > 128) inks.push({ r: data[i]!, g: data[i + 1]!, b: data[i + 2]!, a: 1 });
-  }
-  const coverage = inks.length / (PROBE * PROBE);
-  if (!inks.length) return { words: 'nothing drawn (fully transparent)', sig: 'empty', paper: undefined, opaque: false };
-  const counts = new Map<string, { n: number; color: RGBA }>();
-  for (const c of inks) {
-    const name = nameColor(c);
-    const hit = counts.get(name);
-    if (hit) hit.n++;
-    else counts.set(name, { n: 1, color: c });
-  }
-  const ranked = [...counts.entries()].sort((a, b) => b[1].n - a[1].n);
-  const main = ranked.filter(([, v]) => v.n / inks.length >= 0.08);
-  const opaque = coverage > 0.9;
-  const surface = opaque ? 'fills its whole box' : `about ${Math.round(coverage * 100)}% of the box is drawn, the rest is transparent`;
-  let colors: string;
-  if (main.length <= 1) colors = `a single ${ranked[0]![0]} color`;
-  else {
-    const [first, ...rest] = main;
-    colors = `mostly ${first![0]} (${Math.round((first![1].n / inks.length) * 100)}%), with ${rest.slice(0, 4).map(([name]) => name).join(', ')}`;
-  }
-  // Opaque: the dominant color is the paper. Transparent: what is drawn is ink on someone else's paper.
-  const paper = opaque ? paperOf(ranked[0]![1].color) : paperForInk(toneOf(inks));
-  return {
-    words: `${colors}; ${surface}`,
-    sig: `${main.length <= 1 ? 'mono' : 'multi'}${opaque ? 'F' : ''}:${main.slice(0, 3).map(([name]) => name).join('/')}`,
-    paper,
-    opaque,
-  };
-}
-
-/** Whether a set of ink colors is mostly dark, mostly light, or in between. */
-function toneOf(colors: RGBA[]): 'dark' | 'light' | 'mid' | undefined {
-  if (!colors.length) return undefined;
-  const l = colors.reduce((sum, c) => sum + toOklch(c).l, 0) / colors.length;
-  return l < 0.5 ? 'dark' : l > 0.75 ? 'light' : 'mid';
-}
-
-function paperOf(color: RGBA): Plan['paper'] {
-  const { l } = toOklch(color);
-  return l > 0.75 ? 'light' : l < 0.4 ? 'dark' : undefined;
-}
-
-/** Dark ink was drawn to sit on light paper, and the other way round. */
-function paperForInk(tone: ReturnType<typeof toneOf>): Plan['paper'] {
-  return tone === 'dark' ? 'light' : tone === 'light' ? 'dark' : undefined;
+  return describePixels(data);
 }
 
 export function hasOwnText(el: Element): boolean {

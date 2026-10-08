@@ -16,6 +16,12 @@ const TASK =
 
 type Kind = keyof Required<Job['ask']>;
 
+/**
+ * Graphic roles for a picture that fills its whole box (a photo, an avatar): every role but "icon",
+ * which would paint its whole box one flat color. Jev still picks which.
+ */
+const FILLED_GRAPHIC: Record<string, string> = Object.fromEntries(Object.entries(GRAPHIC_TOKENS).filter(([token]) => token !== 'icon'));
+
 function instructions(kind: Kind, id: string, job: Job): string {
   const about = `About element ${id} only:`;
   switch (kind) {
@@ -53,7 +59,7 @@ export function buildRequest(host: string, page: string, jobs: Job[]): BuiltRequ
     const { site: _site, page: _page, ...facts } = job.facts;
     elements[id] = facts;
     for (const kind of Object.keys(job.ask) as Kind[]) {
-      questions[`${id}_${kind}`] = { type: 'choice', instructions: instructions(kind, id, job), criteria: CRITERIA[kind] };
+      questions[`${id}_${kind}`] = { type: 'choice', instructions: instructions(kind, id, job), criteria: kind === 'graphic' && job.filled ? FILLED_GRAPHIC : CRITERIA[kind] };
     }
   });
   return { state: { task: TASK, site: host, page, elements }, questions };

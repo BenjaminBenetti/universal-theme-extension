@@ -4,6 +4,7 @@ import { compileTheme, themeVarsCss } from '../themes/css.ts';
 import { BUILTIN_THEMES } from '../themes/index.ts';
 import { writeLabels } from './cache.ts';
 import { JevError, systemOne, DEFAULT_API_BASE } from './jev.ts';
+import { readPixels } from './pixels.ts';
 import { buildRequest, MAX_JOBS_PER_REQUEST, parseAnswers } from './questions.ts';
 import { syncBootCss } from './registration.ts';
 
@@ -28,6 +29,9 @@ chrome.runtime.onMessage.addListener((message: Message, sender, sendResponse) =>
       return true;
     case 'theme-css':
       builtinThemeCss(message.id).then(sendResponse);
+      return true;
+    case 'pixels':
+      readPixels(message.url).then(sendResponse);
       return true;
     case 'inject-user-css':
       if (sender.tab?.id !== undefined) {

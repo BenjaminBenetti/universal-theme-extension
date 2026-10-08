@@ -13,6 +13,7 @@
 import { flatParent, RULES_EVENT, SHADOW_EVENT, SHEETS_EVENT, ShadowRoots, shadowRootOf, walk } from './dom.ts';
 import { isTransparent, toHex } from '../shared/color.ts';
 import { MeasurePass, originals, type Job, type Plan } from './measure.ts';
+import { whenPixels } from './pixels.ts';
 import { scrambleText } from './scramble.ts';
 import { StyleMemo } from './memo.ts';
 import { addSelector, collectColorSelectors, matchAll } from './styles.ts';
@@ -126,6 +127,7 @@ function topHost(): string {
 async function start() {
   if (!root) return;
   for (const type of [SHADOW_EVENT, SHEETS_EVENT, RULES_EVENT]) window.addEventListener(type, onPageEvent, true);
+  document.addEventListener('mouseout', onMouseOut, { capture: true, passive: true });
   const [loaded, custom, stored] = await Promise.all([loadSettings(), loadCustomThemes(), chrome.storage.local.get(cacheKey(host))]);
   settings = loaded;
   customThemes = custom;
@@ -315,6 +317,64 @@ function isStylesheet(el: Element): boolean {
   return el.localName === 'style' || (el.localName === 'link' && /stylesheet/i.test(el.getAttribute('rel') ?? ''));
 }
 
+// ---------------------------------------------------------------------------------------------
+// Passing states. A box measured mid-animation (a new message flashing in) or while the pointer
+// styles it (hover) shows colors it has only for a moment. Labeled by those, it would keep them.
+
+/** Hovered elements → boxes measured while they were hovered (the box itself, or its parent). */
+const measuredWhileHovered = new WeakMap<Element, Set<Element>>();
+const awaitingAnimations = new WeakSet<Element>();
+
+/** Whether `el` was just measured in a passing state; if so, it is measured again once at rest. */
+function inPassingState(el: Element): boolean {
+  let passing = false;
+  for (const hovered of [el, flatParent(el)]) {
+    if (!hovered || hovered === document.body || hovered === root || !hovered.matches(':hover')) continue;
+    let boxes = measuredWhileHovered.get(hovered);
+    if (!boxes) measuredWhileHovered.set(hovered, (boxes = new Set()));
+    boxes.add(el);
+    passing = true;
+  }
+  const animations = el.getAnimations().filter(animatesColor);
+  if (animations.length) {
+    passing = true;
+    if (!awaitingAnimations.has(el)) {
+      awaitingAnimations.add(el);
+      Promise.allSettled(animations.map((a) => a.finished)).then(() => {
+        awaitingAnimations.delete(el);
+        measureAgain(el);
+      });
+    }
+  }
+  return passing;
+}
+
+/** A running animation, with an end, of a color or opacity on the element itself. */
+function animatesColor(animation: Animation): boolean {
+  const effect = animation.effect;
+  if (animation.playState !== 'running' || !(effect instanceof KeyframeEffect) || effect.pseudoElement) return false;
+  if (effect.getComputedTiming().endTime === Infinity) return false;
+  return effect.getKeyframes().some((frame) => Object.keys(frame).some((p) => /color|background|fill|stroke|opacity|shadow/i.test(p)));
+}
+
+/** The pointer left elements: boxes measured under them are measured again. */
+function onMouseOut(event: MouseEvent) {
+  const to = event.relatedTarget as Node | null;
+  for (let left = event.target as Element | null; left; left = left.parentElement) {
+    if (to && left.contains(to)) break; // the pointer is still inside this one
+    const boxes = measuredWhileHovered.get(left);
+    if (!boxes) continue;
+    measuredWhileHovered.delete(left);
+    for (const el of boxes) measureAgain(el);
+  }
+}
+
+function measureAgain(el: Element) {
+  if (!active || !el.isConnected) return;
+  markSubtree(el, true);
+  scheduleFlush();
+}
+
 function markSubtree(start: Element, styleChanged = false) {
   walk(
     start,
@@ -443,7 +503,10 @@ function flush(sync = false) {
       const plans = pass.measure(el);
       results.push([el, plans]);
       const key = keys.get(el);
-      if (key !== undefined && !plans.some((p) => p.deferred || p.retry)) memo.learn(key, plans, originals.get(el)!, restyled.has(el));
+      // Colors seen mid-animation or under the pointer are measured again at rest, and are never
+      // taught to the memo, which would hand them to every copy.
+      const passing = inPassingState(el);
+      if (key !== undefined && !passing && !plans.some((p) => p.deferred || p.retry || p.waitPixels)) memo.learn(key, plans, originals.get(el)!, restyled.has(el));
       restyled.delete(el);
     }
     pageWords = pass.page;
@@ -462,6 +525,16 @@ function settle(el: Element, plans: Plan[]) {
   if (plans[0]?.deferred) {
     // Stays crushed (invisible) until it has pixels; then it is measured for real.
     el.addEventListener('load', () => (markSubtree(el), scheduleFlush()), { once: true });
+    return;
+  }
+  const waitPixels = plans.find((p) => p.waitPixels)?.waitPixels;
+  if (waitPixels) {
+    // Another site's image: wait for the background to look at it rather than let Jev guess.
+    whenPixels(waitPixels, () => {
+      if (!active || !el.isConnected) return;
+      markSubtree(el);
+      scheduleFlush();
+    });
     return;
   }
   if (plans[0]?.retry) retryCanvas(el);

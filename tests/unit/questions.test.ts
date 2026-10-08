@@ -24,6 +24,16 @@ describe('buildRequest', () => {
   });
 });
 
+describe('graphics that fill their box', () => {
+  it('are never offered "icon": a single color would paint the whole box', () => {
+    const photo: Job = { ...job('a', { graphic: true }), filled: true };
+    const { questions } = buildRequest('example.com', 'white page', [photo, job('b', { graphic: true })]);
+    expect(questions.e1_graphic!.criteria).not.toHaveProperty('icon');
+    expect(questions.e1_graphic!.criteria).toHaveProperty('keep');
+    expect(questions.e2_graphic!.criteria).toHaveProperty('icon');
+  });
+});
+
 describe('parseAnswers', () => {
   it('maps choices to labels by signature', () => {
     const jobs = [job('a', { bg: true, fg: true }), job('b', { graphic: true })];

@@ -51,6 +51,42 @@ export const GRAPHICS = `<!doctype html>
   <p>color: <span class="swatch" id="swatch" style="color: #0000a4">#0000a4</span></p>
 </body></html>`;
 
+/**
+ * A chat-like list that grows: a new message flashes red as it arrives (a CSS animation), and the
+ * newest message is pink while the pointer is over the list. Neither passing color may stick.
+ */
+export const DYNAMIC = `<!doctype html>
+<html><head><meta charset="utf-8"><title>Dynamic</title><style>
+  ${BASE}
+  .msg { padding: 12px; margin: 0; }
+  #list:hover .msg:last-child { background: #ffd7e0; }
+  @keyframes arrive { from { background-color: #ff0000; } to { background-color: rgba(255, 0, 0, 0); } }
+  .msg.new { animation: arrive 1.5s linear; }
+</style></head><body>
+  <div id="list"><p class="msg" id="m0">First message</p></div>
+  <script>
+    window.addMessage = (id, isNew) => {
+      const p = document.createElement('p');
+      p.className = 'msg' + (isNew ? ' new' : '');
+      p.id = id;
+      p.textContent = 'Message ' + id;
+      document.getElementById('list').append(p);
+    };
+  </script>
+</body></html>`;
+
+/** A 16×16 four-color "photo", served from the other host so the page cannot read its pixels. */
+export const AVATAR_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAKklEQVR4nGM4OSXvPz7sZqKBFzOMGjAsDKhYdek/Pvzs0ha8eNSAYWEAAOFDsl8fRyPcAAAAAElFTkSuQmCC',
+  'base64',
+);
+
+/** Tiny, unnamed avatars from another site, like a chat app's thread participants. */
+export const AVATARS = (otherOrigin: string) => `<!doctype html>
+<html><head><meta charset="utf-8"><title>Avatars</title><style>${BASE}</style></head><body>
+  <p><img class="avatar" id="avatar" src="${otherOrigin}/avatar.png" alt="" aria-hidden="true" width="20" height="20"> 3 replies</p>
+</body></html>`;
+
 /** Web components: open, closed, nested, declarative, and late-upgraded shadow roots. */
 export const SHADOW = `<!doctype html>
 <html><head><meta charset="utf-8"><title>Shadow</title><style>${BASE}</style></head><body>

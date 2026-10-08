@@ -22,6 +22,12 @@ export interface InjectRequest {
   type: 'inject-user-css';
 }
 
+/** Content script → background: describe the pixels of another site's image (PixelInfo or null). */
+export interface PixelsRequest {
+  type: 'pixels';
+  url: string;
+}
+
 /** Content script → background: report progress for the badge / popup. */
 export interface StatusReport {
   type: 'status';
@@ -45,4 +51,4 @@ export interface TabStatus {
   error?: string;
 }
 
-export type Message = LabelRequest | ThemeCssRequest | InjectRequest | StatusReport | StatusQuery;
+export type Message = LabelRequest | ThemeCssRequest | InjectRequest | PixelsRequest | StatusReport | StatusQuery;
