@@ -2,7 +2,7 @@
 // The background may: it reads them and answers with the same description an image of this site
 // would get, so Jev sees a photo as a photo instead of guessing from its file name.
 
-import type { PixelsRequest } from '../shared/messages.ts';
+import type { PixelsRequest, SvgRequest } from '../shared/messages.ts';
 import type { PixelInfo } from '../shared/pixels.ts';
 
 const known = new Map<string, PixelInfo | null>();
@@ -38,4 +38,13 @@ export function whenPixels(url: string, then: () => void): void {
   const callbacks = waiting.get(url);
   if (callbacks) callbacks.push(then);
   else then();
+}
+
+/** The source of another site's SVG image, read by the background, or null if it isn't one. */
+export function remoteSvg(url: string): Promise<string | null> {
+  const request: SvgRequest = { type: 'svg', url };
+  return chrome.runtime.sendMessage(request).then(
+    (text: string | null | undefined) => text ?? null,
+    () => null,
+  );
 }

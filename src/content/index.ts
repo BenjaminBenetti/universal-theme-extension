@@ -13,6 +13,7 @@
 import { flatParent, RULES_EVENT, SHADOW_EVENT, SHEETS_EVENT, ShadowRoots, shadowRootOf, walk } from './dom.ts';
 import { isTransparent, toHex } from '../shared/color.ts';
 import { MeasurePass, originals, type Job, type Plan } from './measure.ts';
+import { drawPicture, type Picture } from './picture.ts';
 import { whenPixels } from './pixels.ts';
 import { scrambleText } from './scramble.ts';
 import { StyleMemo } from './memo.ts';
@@ -82,6 +83,8 @@ let pageWords = '';
 const plansOf = new WeakMap<Element, Plan[]>();
 const waiting = new Map<string, Set<Element>>();
 const queued = new Map<string, Job>();
+/** How to draw the graphic a queued signature is about, for Jev to look at. */
+const pictures = new Map<string, Picture>();
 const inflight = new Set<string>();
 const attempts = new Map<string, number>();
 const dirty = new Set<Element>();
@@ -201,7 +204,7 @@ function onFirstFrame() {
   if (!active || ready) return;
   ready = true;
   root.setAttribute('data-ute-m', '');
-  new MeasurePass(host, new Set([root])).measureRoot(root);
+  new MeasurePass(host).measureRoot(root);
   root.removeAttribute('data-ute-m');
   flush();
 }
@@ -498,7 +501,7 @@ function flush(sync = false) {
     el.setAttribute('data-ute-m', '');
   }
   try {
-    const pass = new MeasurePass(host, new Set(toMeasure));
+    const pass = new MeasurePass(host);
     for (const el of toMeasure) {
       const plans = pass.measure(el);
       results.push([el, plans]);
@@ -543,6 +546,8 @@ function settle(el: Element, plans: Plan[]) {
   for (const plan of plans) {
     if (!plan.job) continue;
     const entry = cache[plan.job.sig];
+    // Copies that look alike share one question, about the first copy queued: show Jev that one.
+    if (plan.picture && !pictures.has(plan.job.sig) && (!entry || (settings && isExpired(entry, settings)))) pictures.set(plan.job.sig, plan.picture);
     if (!entry) {
       missing = true;
       queue(plan.job);
@@ -670,16 +675,25 @@ function scrambled(job: Job): Job {
   return job.facts.text === undefined ? job : { ...job, facts: { ...job.facts, text: scrambleText(job.facts.text) } };
 }
 
+/** The job with a picture of its graphic for Jev to look at, if it has one that can be drawn. */
+async function withPicture(job: Job): Promise<Job> {
+  const picture = pictures.get(job.sig);
+  const image = picture && (await drawPicture(picture));
+  return image ? { ...job, image } : job;
+}
+
 function sendQueued() {
   if (fatalError) return;
   const jobs = [...queued.values()];
   queued.clear();
+  // Privacy mode sends no pictures: they can show what the page says, and who is on it.
+  const privacy = settings && modeFor(settings, host) === 'privacy';
   for (let i = 0; i < jobs.length; i += MAX_JOBS_PER_MESSAGE) {
     const batch = jobs.slice(i, i + MAX_JOBS_PER_MESSAGE);
     for (const job of batch) inflight.add(job.sig);
-    const request: LabelRequest = { type: 'label', host, page: pageWords, jobs: settings && modeFor(settings, host) === 'privacy' ? batch.map(scrambled) : batch };
-    chrome.runtime
-      .sendMessage(request)
+    const page = pageWords;
+    (privacy ? Promise.resolve(batch.map(scrambled)) : Promise.all(batch.map(withPicture)))
+      .then((sent) => chrome.runtime.sendMessage({ type: 'label', host, page, jobs: sent } satisfies LabelRequest))
       .then((res: LabelResponse) => onLabels(batch, res))
       .catch((err: Error) => onLabels(batch, { ok: false, error: err.message, fatal: false }));
   }
@@ -689,6 +703,7 @@ function onLabels(batch: Job[], res: LabelResponse) {
   for (const job of batch) inflight.delete(job.sig);
   if (res.ok) {
     const now = Date.now();
+    for (const job of batch) pictures.delete(job.sig);
     for (const [sig, l] of Object.entries(res.labels)) {
       cache[sig] = { l, t: now };
       resolveSig(sig);
@@ -696,6 +711,7 @@ function onLabels(batch: Job[], res: LabelResponse) {
   } else if (res.fatal) {
     // Without a working key nothing can ever be labeled: show the page as the site made it.
     fatalError = res.error;
+    pictures.clear();
     applySettings();
   } else {
     lastError = res.error;
@@ -703,6 +719,7 @@ function onLabels(batch: Job[], res: LabelResponse) {
       const n = (attempts.get(job.sig) ?? 0) + 1;
       attempts.set(job.sig, n);
       if (n < MAX_ATTEMPTS) setTimeout(() => (queue(job), sendQueued()), 1000 * 2 ** (n - 1));
+      else pictures.delete(job.sig);
     }
   }
   report();

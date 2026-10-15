@@ -91,3 +91,34 @@ export function offColors(colors: string[], expected: string, tolerance = 2): st
   const want = channels(expected);
   return colors.filter((c) => channels(c).some((v, i) => Math.abs(v - want[i]!) > tolerance));
 }
+
+/** A picture Jev was shown (a base64 JPEG): its size, and its colors ("#rrggbb") at some points. */
+export async function pictureAt(page: Page, jpeg: string, points: Array<[number, number]>): Promise<{ width: number; height: number; colors: string[] }> {
+  const viewer = await page.context().newPage();
+  const seen = await viewer.evaluate(
+    async ({ jpeg, points }) => {
+      const img = new Image();
+      img.src = `data:image/jpeg;base64,${jpeg}`;
+      await img.decode();
+      const canvas = new OffscreenCanvas(img.width, img.height);
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0);
+      const hex = (v: number) => v.toString(16).padStart(2, '0');
+      const colors = points.map(([x, y]) => {
+        const [r, g, b] = ctx.getImageData(x, y, 1, 1).data;
+        return `#${hex(r!)}${hex(g!)}${hex(b!)}`;
+      });
+      return { width: img.width, height: img.height, colors };
+    },
+    { jpeg, points },
+  );
+  await viewer.close();
+  return seen;
+}
+
+/** Whether two "#rrggbb" colors are within `tolerance` per channel (JPEG blurs colors a little). */
+export function near(a: string, b: string, tolerance = 24): boolean {
+  const channels = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  const [x, y] = [channels(a), channels(b)];
+  return x.every((v, i) => Math.abs(v - y[i]!) <= tolerance);
+}

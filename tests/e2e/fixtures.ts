@@ -52,6 +52,9 @@ export const GRAPHICS = `<!doctype html>
   <svg id="logo" width="120" height="24" viewBox="0 0 120 24"><rect x="0" y="4" width="100" height="16" fill="#171d27"/><circle cx="110" cy="12" r="6" fill="#ff6201"/></svg>
   <div id="plus" style="position: relative; display: inline-block; padding: 4px 8px">Plus<span id="layer" style="position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4)"></span></div>
   <p>color: <span class="swatch" id="swatch" style="color: #0000a4">#0000a4</span></p>
+  <svg style="display: none"><symbol id="i-square" viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/></symbol></svg>
+  <svg class="icon" id="sprite-icon" width="24" height="24" style="color: #d93025"><use href="#i-square" fill="currentColor"/></svg>
+  <article class="comment"><div><div><a class="author" href="#"><img class="avatar" id="local-avatar" src="/avatar.png" alt="" width="20" height="20"></a></div></div></article>
 </body></html>`;
 
 /**
@@ -78,16 +81,21 @@ export const DYNAMIC = `<!doctype html>
   </script>
 </body></html>`;
 
-/** A 16×16 four-color "photo", served from the other host so the page cannot read its pixels. */
+/** A 16×16 "photo" in four colors, one per quarter. The avatars page loads it from the other host, so the page cannot read its pixels. */
+export const AVATAR_QUARTERS = { topLeft: '#c9946e', topRight: '#463428', bottomLeft: '#78aad2', bottomRight: '#e6d2b4' };
 export const AVATAR_PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAKklEQVR4nGM4OSXvPz7sZqKBFzOMGjAsDKhYdek/Pvzs0ha8eNSAYWEAAOFDsl8fRyPcAAAAAElFTkSuQmCC',
   'base64',
 );
 
+/** An emoji from another site, as a CDN serves it: an SVG file (a yellow face on transparent). */
+export const EMOJI_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36"><circle cx="18" cy="18" r="16" fill="#ffcc4d"/><circle cx="12" cy="14" r="3" fill="#664500"/><circle cx="24" cy="14" r="3" fill="#664500"/></svg>';
+
 /** Tiny, unnamed avatars from another site, like a chat app's thread participants. */
 export const AVATARS = (otherOrigin: string) => `<!doctype html>
 <html><head><meta charset="utf-8"><title>Avatars</title><style>${BASE}</style></head><body>
   <p><img class="avatar" id="avatar" src="${otherOrigin}/avatar.png" alt="" aria-hidden="true" width="20" height="20"> 3 replies</p>
+  <p>Nice <img class="emoji" id="emoji" src="${otherOrigin}/emoji.svg" alt="" width="20" height="20"></p>
 </body></html>`;
 
 /** Web components: open, closed, nested, declarative, and late-upgraded shadow roots. */

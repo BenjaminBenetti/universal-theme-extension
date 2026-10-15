@@ -1,10 +1,11 @@
+import type { JobImage } from '../shared/images.ts';
 import type { Message, LabelResponse, StatusReport } from '../shared/messages.ts';
 import { CUSTOM_THEMES_KEY, loadCustomThemes, loadSettings, SETTINGS_KEY, themeCssKey } from '../shared/settings.ts';
 import { compileTheme, themeVarsCss } from '../themes/css.ts';
 import { BUILTIN_THEMES } from '../themes/index.ts';
 import { writeLabels } from './cache.ts';
-import { JevError, systemOne, DEFAULT_API_BASE } from './jev.ts';
-import { readPixels } from './pixels.ts';
+import { JevError, systemOne, DEFAULT_API_BASE, type SystemOneResponse } from './jev.ts';
+import { drawRemote, readPixels, readSvg } from './pixels.ts';
 import { buildRequest, MAX_JOBS_PER_REQUEST, parseAnswers } from './questions.ts';
 import { syncBootCss } from './registration.ts';
 
@@ -33,6 +34,9 @@ chrome.runtime.onMessage.addListener((message: Message, sender, sendResponse) =>
     case 'pixels':
       readPixels(message.url).then(sendResponse);
       return true;
+    case 'svg':
+      readSvg(message.url).then(sendResponse);
+      return true;
     case 'inject-user-css':
       if (sender.tab?.id !== undefined) {
         chrome.scripting
@@ -48,13 +52,28 @@ chrome.runtime.onMessage.addListener((message: Message, sender, sendResponse) =>
   }
 });
 
+/** Images are a preview feature on Jev's side: after Jev refuses them, ask without them for a while. */
+const IMAGES_PAUSE_MS = 30 * 60_000;
+let imagesPausedUntil = 0;
+
 async function label(host: string, page: string, jobs: Parameters<typeof buildRequest>[2]): Promise<LabelResponse> {
   const settings = await loadSettings();
   if (!settings.apiKey) return { ok: false, error: 'No Jev API key configured', fatal: true };
   try {
     const batch = jobs.slice(0, MAX_JOBS_PER_REQUEST);
-    const { state, questions } = buildRequest(host, page, batch);
-    const response = await systemOne(settings.apiKey, state, questions, settings.apiBase || DEFAULT_API_BASE);
+    const apiBase = settings.apiBase || DEFAULT_API_BASE;
+    const images = Date.now() < imagesPausedUntil ? [] : await Promise.all(batch.map((job) => imageOf(job.image)));
+    const request = buildRequest(host, page, batch, images);
+    let response: SystemOneResponse;
+    try {
+      response = await systemOne(settings.apiKey, request, apiBase);
+    } catch (err) {
+      if (!request.assets || !(err instanceof JevError) || (err.status !== 400 && err.status !== 413)) throw err;
+      // The words alone still describe every element, so the page is themed either way.
+      console.warn('[ute] Jev refused the images; asking without them', err);
+      imagesPausedUntil = Date.now() + IMAGES_PAUSE_MS;
+      response = await systemOne(settings.apiKey, buildRequest(host, page, batch), apiBase);
+    }
     const labels = parseAnswers(batch, response);
     await writeLabels(host, labels);
     return { ok: true, labels };
@@ -63,6 +82,12 @@ async function label(host: string, page: string, jobs: Parameters<typeof buildRe
     console.warn('[ute] labeling failed', err);
     return { ok: false, error: (err as Error).message, fatal };
   }
+}
+
+/** A picture as Jev receives it: drawn by the page already, or another site's image drawn here. */
+async function imageOf(image: JobImage | undefined): Promise<string | undefined> {
+  if (!image) return undefined;
+  return 'jpeg' in image ? image.jpeg : drawRemote(image.url, image.backdrop);
 }
 
 /** A built-in theme's variables, compiled once and kept in storage for content scripts to read. */

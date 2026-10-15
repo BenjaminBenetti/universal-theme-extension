@@ -51,7 +51,7 @@ export const GRAPHIC_TOKENS = {
   icon: 'A small single-color interface icon (arrow, menu, search glass, close, dots, chevron)',
   lineart:
     'Mostly one tone of ink on a plain background: text, a wordmark, line art, a diagram, a spreadsheet grid, or a document page (it may have a few colored accents)',
-  keep: 'A photo, video, illustration, colorful logo, map, game, or chart whose original colors must be kept',
+  keep: 'A photo, avatar or profile picture, video, illustration or artwork, emoji, colorful logo, map, game, or chart whose original colors must be kept',
 } as const;
 
 export type BgToken = keyof typeof BG_TOKENS;

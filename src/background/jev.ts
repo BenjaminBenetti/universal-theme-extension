@@ -19,6 +19,20 @@ export interface ChoiceAnswer {
   probabilities: Record<string, number>;
 }
 
+/** An image in a request. Its key in `assets` is written where the image belongs, and Jev sees the image there. */
+export interface ImageAsset {
+  type: 'image';
+  format: 'jpg' | 'png';
+  data_base64: string;
+}
+
+export interface SystemOneRequest {
+  state: unknown;
+  questions: Record<string, ChoiceQuestion>;
+  /** Images are a preview ("Danger Zone") feature, sent with a header that turns them on. */
+  assets?: Record<string, ImageAsset>;
+}
+
 export interface SystemOneResponse {
   model: string;
   answers: Record<string, ChoiceAnswer>;
@@ -54,21 +68,15 @@ async function withSlot<T>(fn: () => Promise<T>): Promise<T> {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export async function systemOne(
-  apiKey: string,
-  state: unknown,
-  questions: Record<string, ChoiceQuestion>,
-  apiBase = DEFAULT_API_BASE,
-): Promise<SystemOneResponse> {
+export async function systemOne(apiKey: string, request: SystemOneRequest, apiBase = DEFAULT_API_BASE): Promise<SystemOneResponse> {
+  const headers: Record<string, string> = { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' };
+  if (request.assets) headers['TypeSafe-Danger-Zone-Images'] = 'true';
+  const body = JSON.stringify({ model: MODEL, ...request });
   return withSlot(async () => {
     for (let attempt = 0; ; attempt++) {
       let response: Response;
       try {
-        response = await fetch(`${apiBase}/v1/systemone`, {
-          method: 'POST',
-          headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
-          body: JSON.stringify({ model: MODEL, state, questions }),
-        });
+        response = await fetch(`${apiBase}/v1/systemone`, { method: 'POST', headers, body });
       } catch (err) {
         if (attempt < RETRIES) {
           await sleep(500 * 3 ** attempt);

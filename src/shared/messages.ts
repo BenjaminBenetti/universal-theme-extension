@@ -28,6 +28,12 @@ export interface PixelsRequest {
   url: string;
 }
 
+/** Content script → background: the source of another site's SVG image, to draw it here (a string, or null if it isn't one). */
+export interface SvgRequest {
+  type: 'svg';
+  url: string;
+}
+
 /** Content script → background: report progress for the badge / popup. */
 export interface StatusReport {
   type: 'status';
@@ -51,4 +57,4 @@ export interface TabStatus {
   error?: string;
 }
 
-export type Message = LabelRequest | ThemeCssRequest | InjectRequest | PixelsRequest | StatusReport | StatusQuery;
+export type Message = LabelRequest | ThemeCssRequest | InjectRequest | PixelsRequest | SvgRequest | StatusReport | StatusQuery;

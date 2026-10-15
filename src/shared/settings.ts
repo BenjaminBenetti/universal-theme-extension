@@ -4,9 +4,10 @@ import type { Labels } from './tokens.ts';
 export type ThemeChoice = string | 'off';
 
 /**
- * How much of a page's text Jev reads. "performance": each element's text as it is (up to 128
- * characters). "privacy": every letter and digit scrambled first, so Jev sees the shape of the
- * text but not the words; a few labels (status pills, callouts) come out a little less apt.
+ * How much of a page Jev sees. "performance": each element's text as it is (up to 128 characters),
+ * and a picture of each graphic. "privacy": every letter and digit scrambled first, so Jev sees the
+ * shape of the text but not the words, and no pictures; a few labels (status pills, callouts) and
+ * logos come out a little less apt.
  */
 export type TextMode = 'performance' | 'privacy';
 

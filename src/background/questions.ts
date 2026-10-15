@@ -6,13 +6,14 @@
 
 import type { Job } from '../content/measure.ts';
 import { BG_TOKENS, BORDER_TOKENS, FG_TOKENS, GRAPHIC_TOKENS, SOFT_CAPABLE, type Labels } from '../shared/tokens.ts';
-import type { ChoiceQuestion, SystemOneResponse } from './jev.ts';
+import type { ChoiceQuestion, ImageAsset, SystemOneRequest, SystemOneResponse } from './jev.ts';
 
 export const MAX_JOBS_PER_REQUEST = 10;
 
 const TASK =
   'This web page is being recolored with a color theme. Each element below was measured in its original colors; ' +
   'decide which design role each of its colors plays so the theme can repaint it.';
+const IMAGES = "An element's image shows how it looks on the page: its original colors on the color behind it, scaled up to fill a square.";
 
 type Kind = keyof Required<Job['ask']>;
 
@@ -46,23 +47,28 @@ const CRITERIA: Record<Kind, Record<string, string>> = {
   graphic: GRAPHIC_TOKENS,
 };
 
-export interface BuiltRequest {
-  state: unknown;
-  questions: Record<string, ChoiceQuestion>;
-}
-
-export function buildRequest(host: string, page: string, jobs: Job[]): BuiltRequest {
+/** `images[i]` is a base64 JPEG of `jobs[i]`'s graphic, if Jev may look at it. */
+export function buildRequest(host: string, page: string, jobs: Job[], images: Array<string | undefined> = []): SystemOneRequest {
   const elements: Record<string, Record<string, string>> = {};
   const questions: Record<string, ChoiceQuestion> = {};
+  const assets: Record<string, ImageAsset> = {};
   jobs.forEach((job, i) => {
     const id = `e${i + 1}`;
     const { site: _site, page: _page, ...facts } = job.facts;
     elements[id] = facts;
+    const image = images[i];
+    if (image) {
+      // References are matched as text anywhere in the request, so each is a fresh UUID.
+      const ref = crypto.randomUUID();
+      assets[ref] = { type: 'image', format: 'jpg', data_base64: image };
+      facts.image = ref;
+    }
     for (const kind of Object.keys(job.ask) as Kind[]) {
       questions[`${id}_${kind}`] = { type: 'choice', instructions: instructions(kind, id, job), criteria: kind === 'graphic' && job.filled ? FILLED_GRAPHIC : CRITERIA[kind] };
     }
   });
-  return { state: { task: TASK, site: host, page, elements }, questions };
+  const seen = Object.keys(assets).length > 0;
+  return { state: { task: seen ? `${TASK} ${IMAGES}` : TASK, site: host, page, elements }, questions, ...(seen ? { assets } : {}) };
 }
 
 export function parseAnswers(jobs: Job[], response: SystemOneResponse): Record<string, Labels> {

@@ -44,6 +44,12 @@ bobs in the corner of the popup and theme editor.
   describes them in words (Jev is weak at hex/RGB). Jev picks a design token for each background, text
   color, border, and icon. Code only skips questions that have nothing to decide, like a transparent
   background or an inherited color.
+- **Jev sees where each element sits and what each graphic looks like.** Every element comes with
+  the ancestors that say something about it, from the `<body>` down (landmarks, roles, readable
+  class names, backgrounds of their own). Graphics (`<img>`, `<svg>`, `<canvas>`, background
+  pictures) also come with a 280×280 picture in their original colors, on the color behind them.
+  Other sites' images, which a page may not read, are fetched and drawn by the background worker.
+  Pictures use Jev's preview image support; if Jev refuses them, it is asked again without them.
 - **Nothing flashes.** Until Jev has labeled an element it is *crushed* to the theme's base color. A dark
   theme flashes dark and a light theme flashes light, never the site's white. The first paint is crushed
   by a stylesheet registered per theme at `document_start`, before any script runs.
@@ -213,8 +219,9 @@ publishes a GitHub release with it attached.
 - A custom theme's very first paint uses the crush color of the nearest built-in theme, because
   first-paint stylesheets have to be files in the extension. The difference only shows for a moment,
   and then the theme's own page color takes over.
-- Jev cannot see pixels it cannot read (cross-origin images without CORS), so a colorful logo is
-  occasionally recolored as an icon. **Re-layout site** asks again.
+- Jev is shown no picture of a sprite-sheet slice, an image that needs the site's cookies, or
+  anything on a site in privacy mode; those graphics are described in words only, so a colorful logo
+  is occasionally recolored as an icon. **Re-layout site** asks again.
 - Page scripts get original values for properties the theme overrides. The one exception is a text
   color an element inherits rather than sets itself, which reports the theme's value.
 - Closed shadow roots are found when they are attached. A closed root created on a plain element

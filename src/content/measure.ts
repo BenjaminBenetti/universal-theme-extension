@@ -16,8 +16,10 @@ import {
   toOklch,
   type RGBA,
 } from '../shared/color.ts';
+import type { JobImage } from '../shared/images.ts';
 import { describePixels, paperForInk, paperOf, SAMPLE, toneOf, type PixelInfo } from '../shared/pixels.ts';
 import { flatParent } from './dom.ts';
+import { svgStyles, type Picture } from './picture.ts';
 import { remotePixels } from './pixels.ts';
 
 export type Pseudo = '' | 'before' | 'after';
@@ -42,6 +44,8 @@ export interface Job {
    * no shape of its own to paint in one color, so it can't be a single-color icon.
    */
   filled?: boolean;
+  /** A picture of the graphic, added as the job leaves the page (never in privacy mode). */
+  image?: JobImage;
 }
 
 export interface Plan {
@@ -88,12 +92,14 @@ export interface Plan {
   fg?: string;
   /** An image from another site whose pixels the background is reading: measured again once it answers. */
   waitPixels?: string;
+  /** How to draw this graphic for Jev to look at, if Jev is asked about it. */
+  picture?: Picture;
 }
 
 const WHITE: RGBA = { r: 255, g: 255, b: 255, a: 1 };
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const SHAPES = new Set(['path', 'circle', 'rect', 'ellipse', 'line', 'polyline', 'polygon', 'text', 'tspan', 'use']);
-const LANDMARKS = new Set(['header', 'nav', 'main', 'footer', 'aside', 'form', 'dialog', 'table', 'li', 'button', 'a', 'label', 'pre', 'code', 'blockquote', 'figure', 'menu']);
+const LANDMARKS = new Set(['header', 'nav', 'main', 'footer', 'aside', 'article', 'section', 'form', 'dialog', 'table', 'li', 'button', 'a', 'label', 'pre', 'code', 'blockquote', 'figure', 'menu']);
 const FORM_CONTROLS = new Set(['input', 'textarea', 'select', 'button']);
 /** Controls whose ::before/::after don't render (a <button>'s do, and often hold its icon). */
 const NO_PSEUDO = new Set(['input', 'textarea', 'select']);
@@ -122,11 +128,11 @@ export const originals = new WeakMap<Element, Original>();
 export class MeasurePass {
   readonly viewport = { w: innerWidth || 1280, h: innerHeight || 800 };
   private host: string;
-  private flagged: Set<Element>;
+  /** How each ancestor reads in `inside`, worked out once per pass: siblings share most of theirs. */
+  private steps = new Map<Element, Step>();
 
-  constructor(host: string, flagged: Set<Element>) {
+  constructor(host: string) {
     this.host = host;
-    this.flagged = flagged;
   }
 
   /** "white background with near-black text": the page's overall look, for Jev's context. */
@@ -161,10 +167,11 @@ export class MeasurePass {
     const parent = flatParent(el);
     const inherited = this.parentOriginal(parent);
 
-    // Text color is inherited. If the parent is still themed (not flagged in this pass) and this
-    // element's color equals the parent's themed color, it is inheriting: use the parent's original.
+    // Text color is inherited. If this element's color equals its parent's color right now, it is
+    // inheriting: use the parent's original. Right now may be the theme's color, even when the parent
+    // is measured in this pass too (new content added inside a themed part of the page).
     let fg = parseColor(cs.color);
-    if (parent && !this.flagged.has(parent) && sameColor(fg, parseColor(getComputedStyle(parent).color), 0)) fg = inherited.fg;
+    if (parent && sameColor(fg, parseColor(getComputedStyle(parent).color), 0)) fg = inherited.fg;
 
     if (el.namespaceURI === SVG_NS && tag !== 'svg') {
       // Shapes inside an <svg> follow the <svg>'s graphic label; just record what they paint.
@@ -211,6 +218,9 @@ export class MeasurePass {
     let retry = false;
     let waitPixels: string | undefined;
     let filled = false;
+    let picture: Picture | undefined;
+    /** What a graphic's pixels are drawn on: its own background, if any, over what it sits on. */
+    const under = toHex(isTransparent(bg) ? backdrop : composite(bg!, backdrop));
     /** Pixels of a picture this script may read, or the background's reading of another site's. */
     const seePixels = (source: HTMLImageElement | HTMLCanvasElement, url: string, always: boolean): PixelInfo | 'unreadable' | undefined => {
       const local = probePixels(source, always);
@@ -236,9 +246,10 @@ export class MeasurePass {
         paper = paperOf(backdrop); // drawn for what it sits on
         // A whole background picture (not a slice of a sprite sheet) can be looked at like an
         // <img>: the browser already has it. A two-tone icon is then described as two-tone.
-        const picture = replacedBy === undefined ? loadedPicture(pictureUrl, el.getBoundingClientRect(), cs.backgroundSize) : undefined;
-        if (picture === 'loading') retry = true; // look again once the browser hands it over
-        const seen = picture && picture !== 'loading' ? seePixels(picture, pictureUrl, true) : undefined;
+        const whole = replacedBy === undefined ? loadedPicture(pictureUrl, el.getBoundingClientRect(), cs.backgroundSize) : undefined;
+        if (whole === 'loading') retry = true; // look again once the browser hands it over
+        else if (whole) picture = { kind: 'image', source: whole, url: pictureUrl, backdrop: under };
+        const seen = whole && whole !== 'loading' ? seePixels(whole, pictureUrl, true) : undefined;
         const pixels = seen === 'unreadable' ? undefined : seen;
         if (pixels) {
           facts.pixels = pixels.words;
@@ -260,6 +271,9 @@ export class MeasurePass {
         if (main) svgInk.set(el, main);
         else svgInk.delete(el);
         sigParts.push(fills.map((c) => toHex(c)).join(','));
+        const box = el.getBoundingClientRect();
+        const styles = box.width > 0 && box.height > 0 ? svgStyles(el, fg ? toHex(fg) : undefined) : undefined;
+        if (styles) picture = { kind: 'svg', svg: el, styles, w: box.width, h: box.height, backdrop: under };
         // Which text role an icon takes if Jev decides to recolor it.
         ask.fg = true;
       } else {
@@ -285,6 +299,10 @@ export class MeasurePass {
           paper = ownPaper ?? paperOf(backdrop);
           sigParts.push('px:unreadable');
         }
+        // Jev looks at it too once there is something to see. The background draws another site's
+        // image, which the page may not read; a canvas the page may not read can't be drawn at all.
+        const drawable = tag === 'img' ? (source as HTMLImageElement).naturalWidth > 0 || isSvg(source as HTMLImageElement) : !!pixels && !retry;
+        if (drawable) picture = { kind: 'image', source, url, backdrop: under };
       }
     }
 
@@ -345,7 +363,7 @@ export class MeasurePass {
     facts.element = pseudo ? `::${pseudo} decoration of ${openTag(el)}` : openTag(el);
     const text = pseudo ? cs.content.replace(/^["']|["']$/g, '').slice(0, 40) : textSample(el, 128);
     if (text) facts.text = text;
-    const inside = landmarks(el);
+    const inside = this.ancestry(el);
     if (inside) facts.inside = inside;
     facts.size = rect.width || rect.height ? `${Math.round(rect.width)}×${Math.round(rect.height)} px (${sizeClass})` : 'not currently visible';
     if (look.words) facts.look = look.words;
@@ -354,6 +372,8 @@ export class MeasurePass {
     else if (opacity < 1) facts.opacity = `${Math.round(opacity * 100)}%`;
     if (cs.visibility === 'hidden') facts.visibility = 'hidden until activated';
 
+    // Labels from before Jev could see graphics are not reused for ones it can now see.
+    if (picture) sigParts.push('seen');
     const softBg = ask.bg ? isSoftTint(bg!, backdrop) : false;
     // A see-through tint laid over content (an empty absolutely positioned box, or a decorative
     // ::before) stays see-through, or its theme color would cover the content under it.
@@ -369,9 +389,36 @@ export class MeasurePass {
       ...(fg && !isTransparent(fg) ? { fg: toHex(fg) } : {}),
       ...(waitPixels ? { waitPixels } : {}),
       ...(retry ? { retry: true as const } : {}),
+      ...(picture ? { picture } : {}),
       ...cover,
       job: { sig: sigParts.join('|'), facts: { site: this.host, page: this.page, ...facts }, ask, softBg, ...(filled ? { filled } : {}) },
     };
+  }
+
+  /**
+   * Where the element sits, from the <body> down to its parent: "body > … > main > div.feed (white) >
+   * article.post > … > a.author". Only ancestors that say something are listed (a landmark, a custom
+   * element, a role, a readable id or class, or a background of their own, in its original color), so
+   * Jev can tell an avatar in a comment from an icon on a toolbar. "…" stands for plain wrappers.
+   */
+  private ancestry(el: Element): string {
+    /** Nearest first. `gap`: plain wrappers were left out between this one and the nearer one before it. */
+    const found: Array<{ step: string; gap: boolean }> = [];
+    let gap = false;
+    for (let a = flatParent(el); a && a !== document.documentElement; a = flatParent(a)) {
+      let step = this.steps.get(a);
+      if (!step) this.steps.set(a, (step = ancestorStep(a)));
+      if (!step.telling && a !== document.body && found.length) {
+        gap = true;
+        continue;
+      }
+      found.push({ step: step.text, gap });
+      gap = false;
+    }
+    const kept = found.length > MAX_ANCESTORS + 1 ? [...found.slice(0, MAX_ANCESTORS), { ...found[found.length - 1]!, gap: true }] : found;
+    let out = '';
+    for (let i = kept.length - 1; i >= 0; i--) out += kept[i]!.step + (i === 0 ? '' : kept[i]!.gap ? ' > … > ' : ' > ');
+    return out;
   }
 
   private sizeClass(rect: DOMRect, cs: CSSStyleDeclaration): string {
@@ -592,14 +639,51 @@ function textSample(el: Element, max: number): string {
   return out.length > max ? out.slice(0, max) + '…' : out;
 }
 
-function landmarks(el: Element): string {
-  const found: string[] = [];
-  for (let a = flatParent(el), depth = 0; a && depth < 25 && found.length < 3; a = flatParent(a), depth++) {
-    const role = a.getAttribute('role');
-    if (LANDMARKS.has(a.localName)) found.unshift(a.localName);
-    else if (role && !['presentation', 'none', 'generic'].includes(role)) found.unshift(`[role=${role}]`);
+/** Ancestors listed in `inside` besides the <body>, nearest first. */
+const MAX_ANCESTORS = 12;
+const PLAIN_ROLES = new Set(['presentation', 'none', 'generic']);
+
+/** An ancestor as it reads in `inside`: "div#feed.post-list[role=feed] (white)". */
+interface Step {
+  text: string;
+  /** It says something; plain wrappers are left out of the chain. */
+  telling: boolean;
+}
+
+function ancestorStep(a: Element): Step {
+  let step = a.localName;
+  const id = a.id && readable(a.id);
+  if (id) step += `#${id.slice(0, 30)}`;
+  for (const name of readableClasses(a).slice(0, 3)) step += `.${name}`;
+  const role = a.getAttribute('role');
+  if (role && !PLAIN_ROLES.has(role)) step += `[role=${role}]`;
+  const own = originals.get(a)?.behind;
+  const parent = flatParent(a);
+  const under = parent ? originals.get(parent)?.behind : undefined;
+  const paints = own && under && !sameColor(own, under, 3);
+  if (paints) step += ` (${nameColor(own)})`;
+  return { text: step, telling: !!paints || step !== a.localName || LANDMARKS.has(a.localName) || a.localName.includes('-') };
+}
+
+/**
+ * A class name or id as a person wrote it, without the hash a build tool appended ("Box__PalQtd" →
+ * "Box", "Layout-Content-xWL-A" → "Layout-Content"), or undefined if it says nothing.
+ */
+export function readable(name: string): string | undefined {
+  if (/^(_?r_|:r|«r)/i.test(name)) return undefined; // React's generated ids
+  const hashed = /^(.+?)(?:__([A-Za-z0-9_-]{5,8})|-([A-Za-z0-9_-]{5}))$/.exec(name);
+  // A hash has a capital or a digit; a plain word after it is BEM ("story__body") or a name ("nav-items").
+  const bare = hashed && /[A-Z0-9]/.test(hashed[2] ?? hashed[3]!) ? hashed[1]! : name;
+  return meaningful(bare) ? bare : undefined;
+}
+
+function readableClasses(el: Element): string[] {
+  const names = new Set<string>();
+  for (const name of el.classList) {
+    const bare = readable(name);
+    if (bare) names.add(bare);
   }
-  return found.join(' > ');
+  return [...names];
 }
 
 /** Random-looking generated class names (e.g. "gNO89b") tell Jev nothing, so leave them out. */
@@ -615,8 +699,9 @@ function openTag(el: Element): string {
   const add = (name: string, value: string | null, max = 40) => {
     if (value) attrs.push(`${name}="${value.replace(/\s+/g, ' ').trim().slice(0, max)}"`);
   };
-  if (el.id && meaningful(el.id)) add('id', el.id);
-  const classes = [...el.classList].filter(meaningful).slice(0, 5).join(' ');
+  const id = el.id && readable(el.id);
+  if (id) add('id', id);
+  const classes = readableClasses(el).slice(0, 5).join(' ');
   add('class', classes, 80);
   for (const name of ['role', 'type', 'aria-label', 'title', 'alt', 'placeholder', 'name', 'aria-selected', 'aria-current', 'aria-pressed', 'disabled']) {
     add(name, el.getAttribute(name));

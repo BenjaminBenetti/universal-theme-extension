@@ -24,6 +24,30 @@ describe('buildRequest', () => {
   });
 });
 
+describe('pictures', () => {
+  it('go in the request once each, referenced from the element they show', () => {
+    const request = buildRequest('example.com', 'white page', [job('a', { graphic: true }), job('b', { bg: true }), job('c', { graphic: true })], ['AAAA', undefined, 'BBBB']);
+    const elements = (request.state as { elements: Record<string, Record<string, string>> }).elements;
+    const [first, third] = [elements.e1!.image!, elements.e3!.image!];
+    expect(first).toMatch(/^[0-9a-f-]{36}$/);
+    expect(first).not.toBe(third);
+    expect(elements.e2).not.toHaveProperty('image');
+    expect(request.assets).toEqual({
+      [first]: { type: 'image', format: 'jpg', data_base64: 'AAAA' },
+      [third]: { type: 'image', format: 'jpg', data_base64: 'BBBB' },
+    });
+    // Each reference appears exactly once: every use would send the image again.
+    expect(JSON.stringify(request).split(first).length - 1).toBe(2); // in the state, and as the asset's key
+    expect((request.state as { task: string }).task).toContain("element's image");
+  });
+
+  it('are left out entirely when there are none', () => {
+    const request = buildRequest('example.com', 'white page', [job('a', { graphic: true })]);
+    expect(request).not.toHaveProperty('assets');
+    expect((request.state as { task: string }).task).not.toContain('image');
+  });
+});
+
 describe('graphics that fill their box', () => {
   it('are never offered "icon": a single color would paint the whole box', () => {
     const photo: Job = { ...job('a', { graphic: true }), filled: true };

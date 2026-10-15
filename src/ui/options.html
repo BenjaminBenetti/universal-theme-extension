@@ -60,15 +60,15 @@
       <section>
         <h2>Privacy</h2>
         <p class="muted">
-          To tell what an element is, Jev reads up to 128 characters of its text. Privacy mode scrambles every letter
-          and digit first, so Jev sees the shape of the text but not the words. A few details, like status labels, may
-          get a less fitting color.
+          To tell what an element is, Jev reads up to 128 characters of its text and looks at a small picture of each
+          image and icon. Privacy mode scrambles every letter and digit first, so Jev sees the shape of the text but not
+          the words, and sends no pictures. A few details, like status labels and logos, may get a less fitting color.
         </p>
         <div class="field">
           <label for="default-mode">Default for all sites</label>
           <select id="default-mode">
-            <option value="performance">Performance mode: Jev reads page text as is</option>
-            <option value="privacy">Privacy mode: Jev gets page text scrambled</option>
+            <option value="performance">Performance mode: Jev reads page text and sees images</option>
+            <option value="privacy">Privacy mode: Jev gets page text scrambled, no images</option>
           </select>
         </div>
         <p class="muted">Switch privacy mode on or off for one site from the toolbar popup.</p>

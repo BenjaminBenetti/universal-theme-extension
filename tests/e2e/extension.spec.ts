@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { launchExtension, waitForThemed, type Extension } from '../../scripts/lib/extension.ts';
-import { offColors, screenColors, style } from './helpers.ts';
+import { AVATAR_QUARTERS } from './fixtures.ts';
+import { near, offColors, pictureAt, screenColors, style } from './helpers.ts';
 import { startMockJev, type MockJev } from './mock-jev.ts';
 
 // Gruvbox Dark Medium / Light Hard token colors, as computed styles.
@@ -25,6 +26,17 @@ test.afterEach(async () => {
 
 const css = (selector: string, prop: 'backgroundColor' | 'color') => style(page, selector, prop);
 
+/** The picture Jev was shown of the element with this id. */
+const pictureOf = (id: string) => jev.pictures.find((p) => p.facts.element?.includes(`id="${id}"`))?.jpeg;
+
+/** Checks a picture Jev was shown, point by point: [x, y, the color it should be there]. */
+async function expectPicture(jpeg: string | undefined, want: Array<[number, number, string]>) {
+  expect(jpeg, 'Jev was shown no picture').toBeTruthy();
+  const seen = await pictureAt(page, jpeg!, want.map(([x, y]) => [x, y]));
+  expect([seen.width, seen.height]).toEqual([280, 280]);
+  want.forEach(([x, y, color], i) => expect(near(seen.colors[i]!, color), `(${x}, ${y}) is ${seen.colors[i]}, not ${color}`).toBe(true));
+}
+
 test('crushes the page to the theme base color until Jev has labeled it', async () => {
   jev.delayMs = 2500;
   await page.goto(`${jev.url}/fixture`, { waitUntil: 'domcontentloaded' });
@@ -42,6 +54,19 @@ test('crushes the page to the theme base color until Jev has labeled it', async 
   expect(await css('#link', 'color')).toBe(DARK.link);
   expect(await css('body', 'color')).toBe(DARK.text);
   expect(jev.calls).toBeGreaterThan(0);
+});
+
+test("content added inside a themed page is described in the site's colors, not the theme's", async () => {
+  await page.goto(`${jev.url}/fixture`);
+  await waitForThemed(page);
+  // The page's text is themed now; new text inherits it through a wrapper measured with it.
+  await page.evaluate(() => {
+    document.body.insertAdjacentHTML('beforeend', '<section id="fresh"><div id="fresh-wrap"><p id="fresh-p">Fresh text <a href="#">link</a></p></div></section>');
+  });
+  await expect.poll(() => page.getAttribute('#fresh-p', 'data-ute'), { timeout: 5000 }).toBe('');
+  await waitForThemed(page);
+  const themedText = jev.elements.filter((f) => /grayish light yellow/.test(`${f['text color']} ${f['behind it']}`));
+  expect(themedText).toEqual([]);
 });
 
 test('beats inline !important styles', async () => {
@@ -150,6 +175,42 @@ test('graphics keep their details and stay visible on a dark theme', async () =>
   expect(await cdp('#layer', 'backgroundColor')).toMatch(/\/ 0\.4\)$/);
 });
 
+test('Jev sees each graphic as a picture, in its original colors on what it sits on', async () => {
+  await page.goto(`${jev.url}/graphics`);
+  await waitForThemed(page);
+  // A two-tone icon: the white glyph on its indigo tile, and the white page past its rounded corners.
+  await expectPicture(pictureOf('two-tone'), [[140, 140, '#ffffff'], [40, 140, '#4f46e5'], [3, 3, '#ffffff']]);
+  // A wordmark painted in its text color (currentColor), scaled to fit the square.
+  await expectPicture(pictureOf('wordmark'), [[140, 140, '#24292f'], [140, 20, '#ffffff']]);
+  // An icon drawn from a sprite sheet elsewhere on the page (<use href="#…">).
+  await expectPicture(pictureOf('sprite-icon'), [[140, 140, '#d93025'], [10, 10, '#ffffff']]);
+  // An image the page itself may read.
+  const { topLeft, topRight, bottomLeft, bottomRight } = AVATAR_QUARTERS;
+  await expectPicture(pictureOf('local-avatar'), [[70, 70, topLeft], [210, 70, topRight], [70, 210, bottomLeft], [210, 210, bottomRight]]);
+  expect(await page.getAttribute('#local-avatar', 'data-ute-g')).toBe('keep');
+});
+
+test('Jev is told where each element sits, from the body down, without the plain wrappers', async () => {
+  await page.goto(`${jev.url}/graphics`);
+  await waitForThemed(page);
+  const inside = (id: string) => jev.elements.find((f) => f.element?.includes(`id="${id}"`))?.inside;
+  expect(inside('local-avatar')).toBe('body > article.comment > … > a.author');
+  await page.goto(`${jev.url}/fixture`);
+  await waitForThemed(page);
+  // Ancestors with a background of their own say so, in their original color.
+  expect(inside('link')).toBe('body > div#card.card (off-white) > p#para');
+});
+
+test('when Jev refuses pictures, it is asked again without them and the page is still themed', async () => {
+  jev.refusePictures = true;
+  await page.goto(`${jev.url}/graphics`);
+  await waitForThemed(page);
+  expect(jev.pictureRequests).toBeGreaterThan(0);
+  expect(jev.pictures).toEqual([]);
+  expect(await page.getAttribute('#wordmark', 'data-ute-g')).toBe('lineart');
+  expect(await page.getAttribute('#local-avatar', 'data-ute-g')).toBe('keep'); // from its pixels, in words
+});
+
 test('a message that arrives mid-animation is labeled by its resting colors', async () => {
   await page.goto(`${jev.url}/dynamic`);
   await waitForThemed(page);
@@ -182,7 +243,12 @@ test("another site's image is seen through the background, so an avatar stays a 
   // The page may not read the avatar's pixels (it is from another site); the background reads them.
   const avatar = jev.elements.find((f) => f.element?.includes('class="avatar"'));
   expect(avatar?.pixels).toMatch(/fills its whole box/);
+  // The background draws its picture for Jev too.
+  const { topLeft, topRight, bottomLeft, bottomRight } = AVATAR_QUARTERS;
+  await expectPicture(pictureOf('avatar'), [[70, 70, topLeft], [210, 70, topRight], [70, 210, bottomLeft], [210, 210, bottomRight]]);
   expect(await page.getAttribute('#avatar', 'data-ute-g')).toBe('keep');
+  // Another site's SVG (an emoji on a CDN): the background reads its source, and the page draws it.
+  await expectPicture(pictureOf('emoji'), [[140, 200, '#ffcc4d'], [93, 117, '#664500'], [3, 3, '#ffffff']]);
 });
 
 test('a site set to off is left exactly as the site made it', async () => {
@@ -223,6 +289,15 @@ test('privacy mode scrambles element text before Jev sees it, and still themes t
   expect(sent.join(' ')).not.toMatch(/Hello|link|inline/);
   expect(sent).toContainEqual(expect.stringMatching(/^[A-Z][a-z]{4} [a-z]{4} [A-Z][a-z]$/)); // "Hello link Go", scrambled
   expect(await css('#card', 'backgroundColor')).toBe(DARK.raised);
+});
+
+test('privacy mode shows Jev no pictures, and still themes the graphics', async () => {
+  await ext.setSettings({ siteModes: { [jev.host]: 'privacy' } });
+  await page.goto(`${jev.url}/graphics`);
+  await waitForThemed(page);
+  expect(jev.pictureRequests).toBe(0);
+  expect(jev.elements.some((f) => f.image)).toBe(false);
+  expect(await page.getAttribute('#wordmark', 'data-ute-g')).toBe('lineart');
 });
 
 test('the popup switches privacy mode for the site it was opened on', async () => {
