@@ -9,6 +9,8 @@
 // It also keeps theming purely visual: when page scripts read computed colors, they get the
 // site's own colors, not ours (see getComputedStyle below). It must never break the page.
 
+import { MEDIA_TAGS } from '../shared/media.ts';
+
 const SHADOW_EVENT = '__ute_shadow';
 const SHEETS_EVENT = '__ute_sheets';
 const RULES_EVENT = '__ute_rules';
@@ -141,24 +143,56 @@ const getComputedStyleOriginal = window.getComputedStyle;
 const OURS =
   /^-?(color|background(-color|-image)?|border(-(top|right|bottom|left|block|inline)(-(start|end))?)?(-color)?|outline(-color)?|fill|stroke|box-shadow|text-shadow|caret-color|webkit-text-fill-color|text-decoration(-color)?|filter|opacity|accent-color|color-scheme|scrollbar-color|css-text)$/;
 const kebab = (name: string) => name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
-const isOurs = (name: string) => OURS.test(kebab(name));
+const MEDIA = new Set<string>(MEDIA_TAGS);
+/**
+ * Properties our CSS sets only on some elements (see css.ts): on any other, the page already sees its
+ * own value, and reading it needs no restyle. Sites read these often, on large containers.
+ */
+const ONLY_ON: Record<string, (el: Element) => boolean> = {
+  filter: (el) => el.hasAttribute('data-ute-g'),
+  opacity: (el) => MEDIA.has(el.localName) && !el.hasAttribute('data-ute'),
+};
+/** Whether our CSS may change what the page reads for this property of this element. */
+const isOurs = (el: Element, name: string) => {
+  const prop = kebab(name);
+  return OURS.test(prop) && (ONLY_ON[prop]?.(el) ?? true);
+};
 
 function themed(): boolean {
   const theme = document.documentElement?.getAttribute('data-ute-theme');
   return !!theme && theme !== 'off';
 }
 
+/**
+ * Elements whose original colors page scripts are reading right now: our CSS stays off for them
+ * until the script is done (a microtask), so reading several of an element's colors, or the same one
+ * again, costs the browser one restyle instead of two per read. Nothing is painted in between.
+ */
+const reading = new Set<Element>();
+
 function withOriginal<T>(el: Element, read: () => T): T {
-  if (!themed() || el.ownerDocument !== document || el.hasAttribute('data-ute-m')) return read();
-  el.setAttribute('data-ute-nt', '');
-  el.setAttribute('data-ute-m', '');
-  try {
-    return read();
-  } finally {
-    el.removeAttribute('data-ute-m');
-    // Restyle with transitions still off, so switching back never animates.
-    void getComputedStyleOriginal.call(window, el).color;
-    el.removeAttribute('data-ute-nt');
+  if (themed() && el.ownerDocument === document && !el.hasAttribute('data-ute-m')) {
+    if (!reading.size) queueMicrotask(restoreOurs);
+    reading.add(el);
+    el.setAttribute('data-ute-nt', '');
+    el.setAttribute('data-ute-m', '');
+  }
+  return read();
+}
+
+function restoreOurs() {
+  const done = [...reading];
+  reading.clear();
+  for (const el of done) el.removeAttribute('data-ute-m');
+  // Transitions come back once our CSS is styled in again, so switching back never animates.
+  const release = () => {
+    for (const el of done) if (!el.hasAttribute('data-ute-m')) el.removeAttribute('data-ute-nt');
+  };
+  if (document.visibilityState === 'hidden') {
+    void getComputedStyleOriginal.call(window, done[0]!).color; // no frames: restyle now
+    setTimeout(release, 0);
+  } else {
+    requestAnimationFrame(() => setTimeout(release, 0));
   }
 }
 
@@ -168,9 +202,9 @@ window.getComputedStyle = function (this: Window, el: Element, pseudo?: string |
   return new Proxy(real, {
     get(target, prop) {
       if (prop === 'getPropertyValue') {
-        return (name: string) => (isOurs(name) ? withOriginal(el, () => target.getPropertyValue(name)) : target.getPropertyValue(name));
+        return (name: string) => (isOurs(el, name) ? withOriginal(el, () => target.getPropertyValue(name)) : target.getPropertyValue(name));
       }
-      if (typeof prop === 'string' && isOurs(prop)) return withOriginal(el, () => Reflect.get(target, prop, target));
+      if (typeof prop === 'string' && isOurs(el, prop)) return withOriginal(el, () => Reflect.get(target, prop, target));
       const value = Reflect.get(target, prop, target);
       return typeof value === 'function' ? value.bind(target) : value;
     },

@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { contrastRatio, parseColor } from '../../src/shared/color.ts';
+import { MEDIA_TAGS } from '../../src/shared/media.ts';
 import { bootCss, compileTheme, sharedStylesheet, themeVarsCss } from '../../src/themes/css.ts';
 import { derivedColor, FIELDS, legibilityRules, themeJsonSchema, validateTheme, type ThemeDefinition } from '../../src/themes/format.ts';
 import { allThemes, BUILTIN_THEMES, DEFAULT_THEME_ID, findTheme } from '../../src/themes/index.ts';
@@ -181,6 +182,15 @@ describe('generated CSS', () => {
     expect(css).toContain('[data-ute-cover]:not([data-ute-m]):where(:not([data-ute-bg]), [data-ute-bg="inherit"]) { background-color: var(--ute-behind, var(--ute-bg-page)) !important }');
     expect(css).toContain('[data-ute-bg="surface"]:not([data-ute-m]) { background-color: var(--ute-bg-surface) !important; --ute-behind: var(--ute-bg-surface) }');
     expect(css).toContain('[data-ute-bg="content"]:not([data-ute-m]) { --ute-behind: transparent }');
+  });
+
+  it('sets filter and opacity only where the page-world script expects them', () => {
+    // main-world.ts lets page scripts read these directly on any other element, without a restyle.
+    const rules = css.split('}').map((r) => r.split('{')) as Array<[string, string | undefined]>;
+    const setting = (prop: string) => rules.filter(([, body]) => body !== undefined && new RegExp(`(^|;)\\s*${prop}\\s*:`).test(body)).map(([sel]) => sel.trim());
+    expect(setting('filter').length).toBeGreaterThan(0);
+    for (const selector of setting('filter')) expect(selector).toContain('[data-ute-g=');
+    expect(setting('opacity')).toEqual([expect.stringContaining(`:is(${MEDIA_TAGS.join(', ')}):not([data-ute])`)]);
   });
 
   it('crushes the first paint to the base color', () => {

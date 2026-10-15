@@ -92,6 +92,19 @@ test.describe('complex apps', () => {
       text: getComputedStyle(document.body).getPropertyValue('color'),
     }));
     expect(seen).toEqual({ head: 'rgb(11, 87, 208)', probe: expect.stringContaining('url('), text: 'rgb(32, 33, 36)' });
+    // Properties our CSS sets only on some elements are read directly everywhere else: reading the
+    // body's filter switches nothing off (sites do this on large containers, where it is costly).
+    const filters = await page.evaluate(() => {
+      const switched: string[] = [];
+      const watch = new MutationObserver((ms) => ms.forEach((m) => switched.push((m.target as Element).localName)));
+      watch.observe(document, { attributes: true, subtree: true, attributeFilter: ['data-ute-m'] });
+      const read = { body: getComputedStyle(document.body).filter, canvas: getComputedStyle(document.querySelector('canvas')!).filter };
+      return new Promise((r) => setTimeout(() => (watch.disconnect(), r({ read, switched: [...new Set(switched)] })), 50));
+    });
+    expect(filters).toEqual({ read: { body: 'none', canvas: 'none' }, switched: ['canvas'] });
+    // Our CSS comes back as soon as the reading script is done: nothing is left showing the site's colors.
+    expect(await page.evaluate(() => new Promise((r) => setTimeout(() => r(document.querySelectorAll('[data-ute-m]').length), 50)))).toBe(0);
+    expect(await style(page, '.head', 'backgroundColor')).toBe(DARK.bg.accent);
   });
 
   test('a spreadsheet grid, its canvas, and late CSS-in-JS are all themed', async () => {

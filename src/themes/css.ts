@@ -18,11 +18,12 @@
 // Document styles do not reach into shadow roots, so the content script adopts `shadowCss()` —
 // the same rules without the document-level guard — into every shadow root it themes.
 
+import { MEDIA_TAGS } from '../shared/media.ts';
 import { retintFilter, tintFilter } from './filters.ts';
 import { baseOf, FIELDS, SOLID_BG, type ThemeDefinition } from './format.ts';
 import type { CompiledTheme } from './index.ts';
 
-const MEDIA = 'img, video, canvas, iframe, embed, object, picture, image';
+const MEDIA = MEDIA_TAGS.join(', ');
 const BOXES = [
   { suffix: '', attr: 'data-ute' },
   { suffix: '::before', attr: 'data-ute-before' },
