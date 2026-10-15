@@ -10,6 +10,7 @@ type Facts = Record<string, string>;
 function decide(kind: string, facts: Facts): string {
   switch (kind) {
     case 'bg':
+      if (/class="blend/.test(facts.element ?? '')) return 'inherit';
       return /blue/.test(facts.background ?? '') ? 'accent' : /red|pink/.test(facts.background ?? '') ? 'danger' : 'raised';
     case 'fg':
       if (/class="swatch/.test(facts.element ?? '')) return 'content';

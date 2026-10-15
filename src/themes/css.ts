@@ -152,7 +152,7 @@ function sharedCss(tokens: ReturnType<typeof tokenNames>, scope: 'document' | 's
   // Token → color. One attribute per selector so the browser only checks elements that carry it.
   for (const { suffix, attr } of BOXES) {
     for (const token of tokens.bg) {
-      // --ute-behind: the color this box's content sits on, for fixed and sticky boxes inside it.
+      // --ute-behind: the color this box's content sits on, for solid boxes inside it that blend in.
       const behind = suffix ? '' : `; --ute-behind: var(--ute-bg-${token})`;
       rule(`${ON} [${attr}-bg="${token}"]${M}${suffix}`, `background-color: var(--ute-bg-${token}) !important${behind}`);
       // A see-through layer keeps its transparency (--ute-a). Overlays carry the theme's own.
@@ -165,8 +165,10 @@ function sharedCss(tokens: ReturnType<typeof tokenNames>, scope: 'document' | 's
     for (const token of tokens.fg) rule(`${ON} [${attr}-ink="${token}"]${M}${suffix}`, `background-color: var(--ute-fg-${token}) !important`);
   }
   rule(`${ON} a[data-ute-fg="link"]${M}:visited`, 'color: var(--ute-visited) !important');
-  // A fixed or sticky box with no color of its own stays solid, in the color of what it sits on:
-  // page content scrolls underneath it.
+  // A box that kept its own color is what its content sits on: what blends in there stays see-through.
+  rule(`${ON} [data-ute-bg="content"]${M}`, '--ute-behind: transparent');
+  // A solid box that blends in, or had nothing to decide, stays solid in the color of what it sits
+  // on: see-through, whatever scrolls or lies under it would show (a sticky header's page).
   rule(`${ON} [data-ute-cover]${M}:where(:not([data-ute-bg]), [data-ute-bg="inherit"])`, 'background-color: var(--ute-behind, var(--ute-bg-page)) !important');
 
   // Legibility guard (must come after the fg rules): text on a solid fill always uses that fill's

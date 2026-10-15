@@ -177,6 +177,12 @@ describe('generated CSS', () => {
     expect(css).not.toContain('[data-ute-a][data-ute-bg="overlay"]');
   });
 
+  it('paints solid boxes that blend in with what they sit on, which a kept color resets', () => {
+    expect(css).toContain('[data-ute-cover]:not([data-ute-m]):where(:not([data-ute-bg]), [data-ute-bg="inherit"]) { background-color: var(--ute-behind, var(--ute-bg-page)) !important }');
+    expect(css).toContain('[data-ute-bg="surface"]:not([data-ute-m]) { background-color: var(--ute-bg-surface) !important; --ute-behind: var(--ute-bg-surface) }');
+    expect(css).toContain('[data-ute-bg="content"]:not([data-ute-m]) { --ute-behind: transparent }');
+  });
+
   it('crushes the first paint to the base color', () => {
     const boot = bootCss(findTheme('gruvbox-dark-medium')!);
     expect(boot).toContain('html:not([data-ute-theme])');

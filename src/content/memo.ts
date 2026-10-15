@@ -84,5 +84,5 @@ export class StyleMemo {
 
 function fingerprintOf(plans: Plan[], original: Original): string {
   const colors = [original.fg, original.behind].map((c) => (c ? `${Math.round(c.r)},${Math.round(c.g)},${Math.round(c.b)},${c.a.toFixed(2)}` : '-'));
-  return `${colors.join('/')}#${plans.map((p) => `${p.pseudo}:${p.job?.sig ?? '-'}:${p.bgImage}:${p.paint ?? ''}`).join(';')}`;
+  return `${colors.join('/')}#${plans.map((p) => `${p.pseudo}:${p.job?.sig ?? '-'}:${p.bgImage}:${p.paint ?? ''}${p.cover ? ':cover' : ''}`).join(';')}`;
 }

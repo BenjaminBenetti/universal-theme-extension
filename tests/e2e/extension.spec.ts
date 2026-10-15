@@ -101,6 +101,18 @@ test('fixed and sticky boxes that match what they sit on stay solid, in that col
   expect(await css('#month', 'backgroundColor')).toBe(DARK.accent);
 });
 
+test('a solid header that blends in stays solid, though only its wrapper is sticky', async () => {
+  // Reddit: the sticky element is a see-through wrapper; the header bar inside paints the color.
+  await page.goto(`${jev.url}/fixed`);
+  await waitForThemed(page);
+  expect(await page.getAttribute('#masthead', 'data-ute-bg')).toBe('inherit');
+  expect(await page.getAttribute('#masthead', 'data-ute-cover')).toBe('');
+  expect(await css('#masthead', 'backgroundColor')).toBe(await css('body', 'backgroundColor'));
+  expect(await css('#masthead', 'backgroundColor')).not.toBe('rgba(0, 0, 0, 0)');
+  // The see-through wrapper itself has nothing to paint.
+  expect(await page.getAttribute('#top', 'data-ute-cover')).toBeNull();
+});
+
 test('graphics keep their details and stay visible on a dark theme', async () => {
   await page.goto(`${jev.url}/graphics`);
   await waitForThemed(page);

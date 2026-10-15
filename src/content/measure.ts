@@ -326,7 +326,12 @@ export class MeasurePass {
       }
     }
 
-    const cover = floats && !pseudo && !isTransparent(bg) ? { cover: true as const } : {};
+    // A box that paints a solid color stays solid: when it blends in (Jev says "inherit", or there was
+    // nothing to ask) it takes the color of what it sits on instead of turning see-through, which
+    // would show whatever scrolls or lies under it. Fixed and sticky boxes stay solid even when only
+    // partly opaque. Not an icon's ink (a masked background) or a picture's paper.
+    const paints = !pseudo && !isTransparent(bg) && !ask.ink && !ask.graphic;
+    const cover = paints && (floats || bg!.a >= 0.95) ? { cover: true as const } : {};
     if (!ask.bg && !ask.fg && !ask.ink && !ask.border && !ask.graphic) return { el, pseudo, bgImage, ...cover };
 
     // Only boxes that need a decision pay for layout and text reads.

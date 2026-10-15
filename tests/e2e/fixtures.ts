@@ -27,8 +27,11 @@ export const FIXED = `<!doctype html>
   .tile { background: #f1f3f4; color: #202124; height: 400px; margin: 16px 0; }
   #card { background: #0b57d0; padding: 0 16px 16px; }
   #month { position: sticky; top: 72px; background: #0b57d0; padding: 8px 0; }
+  #top { position: sticky; top: 72px; }
+  #masthead { background: #282f36; box-shadow: 0 1px 0 #000000; height: 48px; }
 </style></head><body>
   <nav id="bar"><a href="#">Buy now</a></nav>
+  <div id="top"><header id="masthead" class="blend">Search</header></div>
   <div class="tile">scrolls under the bar</div><div class="tile">and this</div>
   <div id="card"><div id="month" role="heading" aria-level="2">Jun 2026</div><div class="tile">a note</div></div>
 </body></html>`;
